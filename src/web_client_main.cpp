@@ -1,74 +1,76 @@
-#include <iostream>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
-using namespace std;
-#include "QueueFactory.h"
-#include "StateFactory.h"
+#include "namespace.h"
+#include "Job.h"
 #include "JobFactory.h"
+#include "QueueFactory.h"
+#include "SchedulerFactory.h"
+#include "StateFactory.h"
 
+void print_job_details(void *p_job_details)
+{
+    webclient::Job *p_job = (webclient::Job *) p_job_details;
+    
+    if(!p_job)
+    {
+        printf("%s:%s:%d Invalid job details.\n",__FILE__,__FUNCTION__,__LINE__);
+        return;
+    }
+    
+    p_job->print_Job();
+}
 
 void socket_creator(void *p_job_details)
 {
    printf("%s:%s:%d\n",__FILE__,__FUNCTION__,__LINE__);
+   print_job_details(p_job_details);
+   
 }
 
 void socket_connect(void *p_job_details)
 {
    printf("%s:%s:%d\n",__FILE__,__FUNCTION__,__LINE__);
+   print_job_details(p_job_details);
 }
     
 void socket_writer(void *p_job_details)
 {
    printf("%s:%s:%d\n",__FILE__,__FUNCTION__,__LINE__);
+   print_job_details(p_job_details);
 }
     
 void socket_reader(void *p_job_details)
 {
    printf("%s:%s:%d\n",__FILE__,__FUNCTION__,__LINE__);
+   print_job_details(p_job_details);
 }
     
 void socket_destroyer(void *p_job_details)
 {
    printf("%s:%s:%d\n",__FILE__,__FUNCTION__,__LINE__);
+   print_job_details(p_job_details);
 }
 
 int main()
 {
-   Queue_Factory::Instance()->set_total_number_of_queues(5);
+ 
+   webclient::Scheduler_Factory::Instance()->initialize(1,64000,123456,123456);
+   webclient::Scheduler_Factory::Instance()->run();
    
-   printf("queue::Instance()->is_empty(1) returned \
-   %d\n",Queue_Factory::Instance()->is_empty(1));
+   webclient::Job *p_job = (webclient::Job *) calloc(1,sizeof(webclient::Job));
+   webclient::uint32_t length = 0;
+   webclient::Queue_Factory::Instance()->dequeue(webclient::State_Factory::get_init_state(),
+           (void **)&p_job,&length);
 
-   Queue_Factory::Instance()->enqueue(1,(void *)"sriram",strlen("sriram"));
-
+   printf("%s:%s:%d pmsg=%p,length=%d\n",__FILE__,__FUNCTION__,__LINE__,
+           p_job,length);
    
-   printf("queue::Instance()->is_empty(1) returned \
-   %d\n",Queue_Factory::Instance()->is_empty(1));
-
-   char *pmsg = (char *) calloc(1,100);
-   uint32_t length = 0;
-   Queue_Factory::Instance()->dequeue(1,(void **)&pmsg,&length);
-
-   printf("pmsg=%s,length=%d\n",pmsg,length);
-   
-   printf("queue::Instance()->is_empty() returned %d\n",Queue_Factory::Instance()->is_empty(1));
-
-   printf("State_Factory::Instance()->get_total_number_of_states() returned %d\n",State_Factory::get_total_number_of_states());
-
-   for(int index=0; index < State_Factory::get_total_number_of_states(); index++)
-   {
-       State_Factory::run_job_on_this_current_state(State_Factory::get_next_state(index),NULL);
-   }
-
-   Job_Factory::Instance()->create_Jobs(1,64000,123456,123456);
-   Job job_obj;
-   job_obj.set_Job(1,123456,123456);
-   printf("Job_Factory::Instance()->run_Job()\n");
-   Job_Factory::Instance()->run_Job(&job_obj);
-   printf("Job_Factory::Instance()->move_Job()\n");
-   Job_Factory::Instance()->move_Job(&job_obj);
+   webclient::Scheduler_Factory::Instance()->Process_this_Job(p_job);
+   webclient::Scheduler_Factory::Instance()->Process_this_Job(p_job);
+   webclient::Scheduler_Factory::Instance()->Process_this_Job(p_job);
+   webclient::Scheduler_Factory::Instance()->Process_this_Job(p_job);
+   webclient::Scheduler_Factory::Instance()->Process_this_Job(p_job);
+   webclient::Scheduler_Factory::Instance()->Process_this_Job(p_job);
+   webclient::Scheduler_Factory::Instance()->Process_this_Job(p_job);
+   webclient::Scheduler_Factory::Instance()->Process_this_Job(p_job);
    return 1;
 }
 

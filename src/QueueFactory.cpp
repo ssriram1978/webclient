@@ -1,10 +1,18 @@
 #include "QueueFactory.h"
 
-using namespace std;
+webclient::Queue_Factory* webclient::Queue_Factory::m_pInstance = NULL;
 
-Queue_Factory* Queue_Factory::m_pInstance = NULL;
+   webclient::Queue_Factory* webclient::Queue_Factory::Instance()
+   {       
+      if(!webclient::Queue_Factory::m_pInstance)
+      {
+         webclient::Queue_Factory::m_pInstance = new webclient::Queue_Factory();
+      }
+      
+      return webclient::Queue_Factory::m_pInstance;
+   }
 
-Queue_Factory::~Queue_Factory()
+webclient::Queue_Factory::~Queue_Factory()
 {
     for(int queue_index=0; queue_index < total_number_of_queues; queue_index++)
     {
@@ -20,7 +28,7 @@ Queue_Factory::~Queue_Factory()
 }
 
 
-void Queue_Factory::set_total_number_of_queues(uint8_t queue_total)
+void webclient::Queue_Factory::set_total_number_of_queues(uint8_t queue_total)
 {
    if(!queue_total)
    {
@@ -34,7 +42,7 @@ void Queue_Factory::set_total_number_of_queues(uint8_t queue_total)
 
 
 /* adds an element to the queue */
-uint8_t Queue_Factory::enqueue(uint8_t queue_type,void * message,uint32_t message_size)
+uint8_t webclient::Queue_Factory::enqueue(uint8_t queue_type,void * message,uint32_t message_size)
 {
     msgq_node *temp = NULL ;
     uint8_t msq_send_return_code = -1;
@@ -89,7 +97,7 @@ uint8_t Queue_Factory::enqueue(uint8_t queue_type,void * message,uint32_t messag
 }
 
 //Dequeue an element from the queue.
-void Queue_Factory::dequeue(uint8_t queue_type, void **ppMessage, uint32_t *pMessageLength)
+void webclient::Queue_Factory::dequeue(uint8_t queue_type, void **ppMessage, uint32_t *pMessageLength)
 {
    msgq_node *pTmp = NULL;
    
@@ -124,7 +132,7 @@ void Queue_Factory::dequeue(uint8_t queue_type, void **ppMessage, uint32_t *pMes
    (p_g_msgQ+queue_type)->count--;   
 }
 
-uint8_t Queue_Factory::is_empty(uint8_t queue_type)
+uint8_t webclient::Queue_Factory::is_empty(uint8_t queue_type)
 {
    uint8_t are_there_messages_in_msgQ = 0;
    
@@ -149,7 +157,7 @@ uint8_t Queue_Factory::is_empty(uint8_t queue_type)
    return are_there_messages_in_msgQ;
 }
 
-uint64_t Queue_Factory::count(uint8_t queue_type)
+webclient::uint64_t webclient::Queue_Factory::count(uint8_t queue_type)
 {
     if ((queue_type <0) ||
         (queue_type >=total_number_of_queues))

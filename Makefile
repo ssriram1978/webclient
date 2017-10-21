@@ -6,15 +6,14 @@ top_srcdir = /home/ssridhar/git/webclient
 # -Wno-deprecatd-declarations is for 
 CFLAGS+= -g -Wall -Wformat-nonliteral -Wformat-security \
          -Wno-deprecated-declarations \
-         -I${top_srcdir}/include \
+         -Iinclude \
          #-DSINGLE_ROW_SET \
 
 CPPFLAGS+= -std=c++11 
 
-LDFLAGS +=    -Wl,-rpath-link \
+LDFLAGS +=    -Wl \
 	      -lpthread \
-	      -lrt \
-              -lz \
+	      -lz \
 
 web_client_c_sources = \
 

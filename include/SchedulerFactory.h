@@ -1,18 +1,10 @@
-#ifndef Scheduler_Factory_H
-#define Scheduler_Factory_H
+#ifndef SCHEDULER_FACTORY_H
+#define SCHEDULER_FACTORY_H
 
-#include <iostream>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include "namespace.h"
+#include "Job.h"
 
-
-using namespace std;
-
-typedef unsigned char uint8_t;
-typedef unsigned int uint32_t;
-typedef unsigned long uint64_t;
-
+namespace webclient {
 class Scheduler_Factory {
   private:
   Scheduler_Factory();
@@ -29,6 +21,8 @@ class Scheduler_Factory {
     uint32_t remote_ipv4_address);
    void run();
    void stop();
+   void Process_this_Job(webclient::Job *p_job);
 
 };
+}
 #endif

@@ -1,18 +1,9 @@
-#ifndef Queue_Factory_H
-#define Queue_Factory_H
+#ifndef QUEUE_FACTORY_H
+#define QUEUE_FACTORY_H
 
-#include <iostream>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include "namespace.h"
 
-using namespace std;
-
-typedef unsigned char uint8_t;
-typedef unsigned int uint32_t;
-typedef unsigned long uint64_t;
-
-
+namespace webclient {
 class Queue_Factory {
   private:
  
@@ -45,19 +36,10 @@ public:
    uint8_t enqueue(uint8_t queue_type,void * message,uint32_t message_size);
    void  dequeue(uint8_t queue_type,void **ppMessage, uint32_t *pMessageLength);
    uint8_t is_empty(uint8_t queue_type);
-   uint64_t count(uint8_t queue_type);
+   webclient::uint64_t count(uint8_t queue_type);
    void set_total_number_of_queues(uint8_t queue_total);
-   
-   static Queue_Factory* Instance()
-   {       
-      if(!m_pInstance)
-      {
-         m_pInstance = new Queue_Factory();
-      }
-      
-      return m_pInstance;
-   }
+   static Queue_Factory* Instance();
 };
+}
 
 #endif
-

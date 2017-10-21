@@ -1,16 +1,7 @@
-#ifndef State_Factory_H
-#define State_Factory_H
+#ifndef STATE_FACTORY_H
+#define STATE_FACTORY_H
 
-#include <iostream>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
-using namespace std;
-
-typedef unsigned char uint8_t;
-typedef unsigned int uint32_t;
-typedef unsigned long uint64_t;
+#include "namespace.h"
 
 extern void socket_creator(void *);
 extern void socket_connect(void *);
@@ -18,6 +9,7 @@ extern void socket_writer(void *);
 extern void socket_reader(void *);
 extern void socket_destroyer(void *);
 
+namespace webclient {
 class State_Factory {
   private:
      State_Factory();
@@ -47,6 +39,5 @@ class State_Factory {
    static uint8_t get_next_state(uint8_t current_state);
 
 };
-
+}
 #endif
-
