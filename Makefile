@@ -11,9 +11,10 @@ CFLAGS+= -g -Wall -Wformat-nonliteral -Wformat-security \
 
 CPPFLAGS+= -std=c++11 
 
-LDFLAGS +=    -Wl \
-	      -lpthread \
+LDFLAGS +=    -lpthread \
 	      -lz \
+	      #-Wl \
+	      
 
 web_client_c_sources = \
 
