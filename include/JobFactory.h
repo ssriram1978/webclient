@@ -22,7 +22,7 @@ class Job_Factory {
     uint32_t remote_ipv4_address);
   void run_Job(webclient::Job *p_job_obj);
   void move_Job(webclient::Job *p_job_obj);
-  void Enqueue_All_Jobs_to_specified_queue(uint8_t queue_id);
+  static void Enqueue_All_Jobs_to_specified_queue(uint8_t queue_id);
    static Job_Factory* Instance();
 };
 }

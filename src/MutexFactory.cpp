@@ -31,6 +31,8 @@ webclient::Mutex_Factory::Mutex_Factory()
 {
     webclient::Mutex_Factory::mutex_var={};
     webclient::Mutex_Factory::cond_var={};
+    //Initialize Mutex Factory.
+    webclient::Mutex_Factory::Instance()->initialize();
 }
 
 webclient::Mutex_Factory::~Mutex_Factory() 
@@ -71,6 +73,8 @@ void webclient::Mutex_Factory::initialize()
         return;
     }
     
+    printf("%s:%d total_number_of_mutex=%d\n",__FUNCTION__,__LINE__,total_number_of_mutex);
+    
     for(int index=0; index < total_number_of_mutex; index++)
     {
         pthread_mutex_t *p_mutex = (pthread_mutex_t *) calloc(1,sizeof(pthread_mutex_t));
@@ -83,8 +87,8 @@ void webclient::Mutex_Factory::initialize()
 }
 
 void webclient::Mutex_Factory::condition_signal(uint8_t state_type,
-        void (*p_call_back_function)(void*),
-        void *p_job) 
+        void (*p_call_back_function)(uint8_t),
+        uint8_t state_id) 
 {
     uint8_t status = 0;
     
@@ -120,7 +124,7 @@ void webclient::Mutex_Factory::condition_signal(uint8_t state_type,
     }
     
     //Execute the callback function
-    (*p_call_back_function)(p_job);
+    (*p_call_back_function)(state_id);
     
     status = pthread_mutex_unlock(p_mutex);
     if (status != 0)

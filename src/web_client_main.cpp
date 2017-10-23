@@ -4,12 +4,20 @@
 #include "QueueFactory.h"
 #include "SchedulerFactory.h"
 #include "StateFactory.h"
+#include "ThreadFactory.h"
+#include  <signal.h>
 
-uint8_t is_web_client_alive = 1;
+unsigned char time_to_exit = 0;
 
 int is_webclient_alive()
 {
-    return is_web_client_alive;
+    return !time_to_exit;
+}
+
+void INThandler(int dummy) 
+{
+    printf("INThandler: Exiting...\n");
+    time_to_exit = 1;
 }
 
 void print_job_details(void *p_job_details)
@@ -58,10 +66,12 @@ void socket_destroyer(void *p_job_details)
 
 int main()
 {
+   signal(SIGINT, INThandler);
  
    webclient::Scheduler_Factory::Instance()->initialize(1,64000,123456,123456);
    webclient::Scheduler_Factory::Instance()->run();
    
+   webclient::Thread_Factory::Instance()->Initialize_Thread_Factory();
 #if 0
    webclient::Job *p_job = (webclient::Job *) calloc(1,sizeof(webclient::Job));
    webclient::uint32_t length = 0;
@@ -80,6 +90,13 @@ int main()
    webclient::Scheduler_Factory::Instance()->Process_this_Job(p_job);
    webclient::Scheduler_Factory::Instance()->Process_this_Job(p_job);
 #endif
+   
+   
+   while(!time_to_exit)
+   {
+      sleep(1);
+   }
+   
    return 1;
 }
 

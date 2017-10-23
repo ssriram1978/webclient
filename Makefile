@@ -19,7 +19,6 @@ LDFLAGS +=    -lpthread \
 web_client_c_sources = \
 
 web_client_cpp_sources = \
-        src/web_client_main.cpp \
         src/QueueFactory.cpp \
         src/StateFactory.cpp \
         src/Job.cpp \
@@ -27,6 +26,7 @@ web_client_cpp_sources = \
         src/MutexFactory.cpp \
         src/SchedulerFactory.cpp \
         src/ThreadFactory.cpp \
+        src/web_client_main.cpp \
         
 
 web_client_c_objects=$(web_client_c_sources:%.c=%.o)

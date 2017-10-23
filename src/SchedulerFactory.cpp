@@ -2,6 +2,8 @@
 #include "QueueFactory.h"
 #include "StateFactory.h"
 #include "JobFactory.h"
+#include "MutexFactory.h"
+
 
 webclient::Scheduler_Factory* webclient::Scheduler_Factory::m_pInstance = NULL;
 
@@ -88,9 +90,16 @@ void webclient::Scheduler_Factory::initialize(
 
 void webclient::Scheduler_Factory::run()
 {
+    uint8_t state = webclient::State_Factory::get_init_state();
+    
+    webclient::Mutex_Factory::Instance()->condition_signal(
+                webclient::State_Factory::get_init_state(),
+                webclient::Job_Factory::Instance()->Enqueue_All_Jobs_to_specified_queue,
+                state);
+    
    //Enqueue all the Jobs to the queue listed on the first state.
-   webclient::Job_Factory::Instance()->Enqueue_All_Jobs_to_specified_queue(
-   webclient::State_Factory::get_init_state());
+   //webclient::Job_Factory::Instance()->Enqueue_All_Jobs_to_specified_queue(
+   //webclient::State_Factory::get_init_state());
 }
 
 void webclient::Scheduler_Factory::Process_this_Job(webclient::Job *p_job)
@@ -98,6 +107,11 @@ void webclient::Scheduler_Factory::Process_this_Job(webclient::Job *p_job)
    printf("Scheduler_Factory Job_Factory::Instance()->run_Job()\n");
    webclient::Job_Factory::Instance()->run_Job(p_job);
    printf("Scheduler_Factory Job_Factory::Instance()->move_Job()\n");
+   
+   //webclient::Mutex_Factory::Instance()->condition_signal(
+   //             webclient::State_Factory::get_init_state(),
+   //             webclient::Job_Factory::Instance()->move_Job,
+   //             state);
    webclient::Job_Factory::Instance()->move_Job(p_job); 
 }
 

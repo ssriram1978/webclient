@@ -26,8 +26,8 @@ namespace webclient {
         Thread_Factory();
     
     public:
-        Thread_Factory *Instance();
-        void Initialize_Thread();
+        static Thread_Factory *Instance();
+        void Initialize_Thread_Factory();
         void Add_more_threads(uint8_t thread_identifier);
         void Delete_threads(uint8_t thread_identifier);
         virtual ~Thread_Factory();

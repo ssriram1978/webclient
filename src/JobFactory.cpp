@@ -50,7 +50,7 @@ void webclient::Job_Factory::Enqueue_All_Jobs_to_specified_queue(uint8_t queue_i
 {
     if(queue_id < 0 || queue_id > webclient::State_Factory::get_total_number_of_states())
     {
-        printf("%s:%d  Input parameters are invalid.\n",__FILE__,__LINE__);
+        printf("%s:%d  Input parameters are invalid.\n",__FUNCTION__,__LINE__);
         return;
     }
     
@@ -60,6 +60,8 @@ void webclient::Job_Factory::Enqueue_All_Jobs_to_specified_queue(uint8_t queue_i
 
            if(p_job)
            {
+               printf("%s:%d enqueue to queue_id=%d",__FUNCTION__,__LINE__,
+                       queue_id);
               webclient::Queue_Factory::Instance()->enqueue(queue_id,
                       (void *)p_job,sizeof(webclient::Job));
            } 
