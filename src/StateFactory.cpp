@@ -25,6 +25,41 @@ webclient::State_Factory::state_action webclient::State_Factory::state_action_va
 };
 
 
+std::string webclient::State_Factory::convert_state_to_name(uint8_t state_val)
+{
+    std::string state_name;
+    
+    switch(state_val)
+    {
+        case webclient::State_Factory::SOCKET_CONNECT:
+        state_name.assign("SOCKET_CONNECT");
+        break;
+        
+        case webclient::State_Factory::SOCKET_WRITER:
+        state_name.assign("SOCKET_WRITER");
+        break;
+        
+        case webclient::State_Factory::SOCKET_READER:
+        state_name.assign("SOCKET_READER");
+        break;
+
+        case webclient::State_Factory::SOCKET_DESTROYER:
+        state_name.assign("SOCKET_DESTROYER");
+        break;
+
+        case webclient::State_Factory::SOCKET_CREATOR:
+        state_name.assign("SOCKET_CREATOR");
+        break;
+        
+        default:
+        state_name.assign("INVALID");
+        break;
+    }
+    
+    return state_name;
+}
+
+
 webclient::State_Factory::State_Factory()
 {
    //Nothing

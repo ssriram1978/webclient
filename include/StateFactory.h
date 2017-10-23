@@ -37,7 +37,7 @@ class State_Factory {
    static uint8_t get_init_state();
    static uint8_t run_job_on_this_current_state(uint8_t state,void *p_job_details);
    static uint8_t get_next_state(uint8_t current_state);
-
+   static std::string convert_state_to_name(uint8_t state_name);
 };
 }
 #endif

@@ -24,8 +24,10 @@ web_client_cpp_sources = \
         src/StateFactory.cpp \
         src/Job.cpp \
         src/JobFactory.cpp \
+        src/MutexFactory.cpp \
         src/SchedulerFactory.cpp \
-
+        src/ThreadFactory.cpp \
+        
 
 web_client_c_objects=$(web_client_c_sources:%.c=%.o)
 

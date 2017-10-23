@@ -5,6 +5,13 @@
 #include "SchedulerFactory.h"
 #include "StateFactory.h"
 
+uint8_t is_web_client_alive = 1;
+
+int is_webclient_alive()
+{
+    return is_web_client_alive;
+}
+
 void print_job_details(void *p_job_details)
 {
     webclient::Job *p_job = (webclient::Job *) p_job_details;
@@ -55,6 +62,7 @@ int main()
    webclient::Scheduler_Factory::Instance()->initialize(1,64000,123456,123456);
    webclient::Scheduler_Factory::Instance()->run();
    
+#if 0
    webclient::Job *p_job = (webclient::Job *) calloc(1,sizeof(webclient::Job));
    webclient::uint32_t length = 0;
    webclient::Queue_Factory::Instance()->dequeue(webclient::State_Factory::get_init_state(),
@@ -71,6 +79,7 @@ int main()
    webclient::Scheduler_Factory::Instance()->Process_this_Job(p_job);
    webclient::Scheduler_Factory::Instance()->Process_this_Job(p_job);
    webclient::Scheduler_Factory::Instance()->Process_this_Job(p_job);
+#endif
    return 1;
 }
 
