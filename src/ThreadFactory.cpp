@@ -18,6 +18,11 @@ webclient::Thread_Factory *webclient::Thread_Factory::Instance()
     return webclient::Thread_Factory::p_thread_factory;
 }
 
+webclient::Thread_Factory::Thread_Factory()
+{
+    thread_var={};
+}
+
 webclient::Thread_Factory::~Thread_Factory()
 {
     uint8_t total_number_of_mutex = 0;
