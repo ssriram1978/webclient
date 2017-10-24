@@ -34,7 +34,7 @@ public:
 
    ~Queue_Factory();
    uint8_t enqueue(uint8_t queue_type,void * message,uint32_t message_size);
-   void  dequeue(uint8_t queue_type,void **ppMessage, uint32_t *pMessageLength);
+   void dequeue(uint8_t queue_type,void **ppMessage, uint32_t *pMessageLength);
    uint8_t is_empty(uint8_t queue_type);
    webclient::uint64_t count(uint8_t queue_type);
    void set_total_number_of_queues(uint8_t queue_total);

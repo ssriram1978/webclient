@@ -18,8 +18,7 @@ namespace webclient {
         
         typedef std::map<uint8_t,Pthread_variables*> Thread_map;
         Thread_map thread_var;
-        
-        static void dequeue_and_process_job(void *arg);
+                
         static void* thread_main_job(void *arg);
         static Thread_Factory *p_thread_factory;
         

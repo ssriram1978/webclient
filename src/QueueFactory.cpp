@@ -42,7 +42,9 @@ void webclient::Queue_Factory::set_total_number_of_queues(uint8_t queue_total)
 
 
 /* adds an element to the queue */
-uint8_t webclient::Queue_Factory::enqueue(uint8_t queue_type,void * message,uint32_t message_size)
+uint8_t webclient::Queue_Factory::enqueue(uint8_t queue_type,
+                                          void * message,
+                                          uint32_t message_size)
 {
     msgq_node *temp = NULL ;
     uint8_t msq_send_return_code = -1;
@@ -134,7 +136,7 @@ void webclient::Queue_Factory::dequeue(uint8_t queue_type, void **ppMessage, uin
 
 uint8_t webclient::Queue_Factory::is_empty(uint8_t queue_type)
 {
-   uint8_t are_there_messages_in_msgQ = 0;
+   uint8_t are_there_messages_in_msgQ = 1;
    
    if ((queue_type <0) ||
        (queue_type >=total_number_of_queues))
@@ -151,7 +153,7 @@ uint8_t webclient::Queue_Factory::is_empty(uint8_t queue_type)
    
    if ((p_g_msgQ+queue_type)->pFront !=NULL)
    {
-      are_there_messages_in_msgQ = 1;
+      are_there_messages_in_msgQ = 0;
    }
    
    return are_there_messages_in_msgQ;

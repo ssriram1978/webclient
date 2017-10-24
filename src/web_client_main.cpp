@@ -68,10 +68,9 @@ int main()
 {
    signal(SIGINT, INThandler);
  
-   webclient::Scheduler_Factory::Instance()->initialize(1,64000,123456,123456);
-   webclient::Scheduler_Factory::Instance()->run();
-   
-   webclient::Thread_Factory::Instance()->Initialize_Thread_Factory();
+   webclient::Scheduler_Factory::Instance()->initialize(1,5,123456,123456);
+   webclient::Thread_Factory::Instance()->Initialize_Thread_Factory();   
+     
 #if 0
    webclient::Job *p_job = (webclient::Job *) calloc(1,sizeof(webclient::Job));
    webclient::uint32_t length = 0;
@@ -90,7 +89,8 @@ int main()
    webclient::Scheduler_Factory::Instance()->Process_this_Job(p_job);
    webclient::Scheduler_Factory::Instance()->Process_this_Job(p_job);
 #endif
-   
+   sleep(1);
+   webclient::Scheduler_Factory::Instance()->run();
    
    while(!time_to_exit)
    {

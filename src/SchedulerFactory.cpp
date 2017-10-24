@@ -91,28 +91,114 @@ void webclient::Scheduler_Factory::initialize(
 void webclient::Scheduler_Factory::run()
 {
     uint8_t state = webclient::State_Factory::get_init_state();
+    uint64_t *ptr_to_state = (uint64_t *) &state;    
+    
+    printf("\n%s:%s:%d Going to enqueue all jobs to the first state (%d)\n",
+            __FILE__,__FUNCTION__,__LINE__,
+           state);
     
     webclient::Mutex_Factory::Instance()->condition_signal(
                 webclient::State_Factory::get_init_state(),
                 webclient::Job_Factory::Instance()->Enqueue_All_Jobs_to_specified_queue,
-                state);
+                (void *)*ptr_to_state);
     
    //Enqueue all the Jobs to the queue listed on the first state.
    //webclient::Job_Factory::Instance()->Enqueue_All_Jobs_to_specified_queue(
    //webclient::State_Factory::get_init_state());
 }
 
-void webclient::Scheduler_Factory::Process_this_Job(webclient::Job *p_job)
+void webclient::Scheduler_Factory::Perform_a_Job(uint8_t state_id)
 {
-   printf("Scheduler_Factory Job_Factory::Instance()->run_Job()\n");
-   webclient::Job_Factory::Instance()->run_Job(p_job);
-   printf("Scheduler_Factory Job_Factory::Instance()->move_Job()\n");
-   
-   //webclient::Mutex_Factory::Instance()->condition_signal(
-   //             webclient::State_Factory::get_init_state(),
-   //             webclient::Job_Factory::Instance()->move_Job,
-   //             state);
-   webclient::Job_Factory::Instance()->move_Job(p_job); 
+    uint64_t *ptr_to_state = (uint64_t *) &state_id;
+    
+    printf("\n%s:%s:%d Before invoking condition_wait(). state=(%d)\n",
+            __FILE__,__FUNCTION__,__LINE__,
+           state_id);
+    webclient::Job *p_job = (webclient::Job *) webclient::Mutex_Factory::Instance()->condition_wait(
+                state_id,
+                webclient::Scheduler_Factory::Dequeue_Job,
+                (void *)*ptr_to_state);    
+    if(p_job)
+    {
+        printf("\n%s:%s:%d Found a job. state=(%d)\n",
+            __FILE__,__FUNCTION__,__LINE__,
+           state_id);
+        Scheduler_Factory::Execute_Job(p_job);
+        Scheduler_Factory::Move_Job(p_job);
+    }
+    else
+    {
+        printf("\n%s:%s:%d p_job is NULL. state=(%d)\n",
+            __FILE__,__FUNCTION__,__LINE__,
+           state_id);
+    }
+}
+
+void* webclient::Scheduler_Factory::Dequeue_Job(void *p_state)
+{
+    webclient::Job *p_job = NULL;
+    uint8_t state_id = 0;
+    uint64_t arg = (uint64_t) p_state;
+    state_id = (uint8_t) arg;
+    
+    if(state_id < webclient::State_Factory::get_init_state() ||
+       state_id > webclient::State_Factory::get_total_number_of_states())
+    {
+        printf("\n%s:%d Invalid input parameter\n",
+                __FUNCTION__,__LINE__);
+        return p_job;
+    }
+    
+    printf("%s:%s:%d state=%d,is_empty=%d\n",__FILE__,__FUNCTION__,__LINE__,
+           state_id,webclient::Queue_Factory::Instance()->is_empty(state_id));
+    
+    if(!webclient::Queue_Factory::Instance()->is_empty(state_id))
+    {
+        p_job = (webclient::Job *) calloc(1,sizeof(webclient::Job));
+        webclient::uint32_t length = 0;
+        
+        webclient::Queue_Factory::Instance()->dequeue(state_id,
+                (void **)&p_job,
+                &length);
+
+        printf("%s:%s:%d p_job=%p,length=%d\n",__FILE__,__FUNCTION__,__LINE__,
+           p_job,length);
+    }
+    else
+    {
+        printf("%s:%s:%d state=%d. Queue is empty.\n",__FILE__,__FUNCTION__,__LINE__,
+           state_id);
+    }
+    
+    return (void *)p_job;
+}
+
+void webclient::Scheduler_Factory::Execute_Job(webclient::Job *p_job)
+{
+    if(!p_job)
+    {
+        printf("%s:%s:%d p_job is NULL\n",__FILE__,__FUNCTION__,__LINE__);
+        return;
+    }
+    
+    printf("Scheduler_Factory Job_Factory::Instance()->run_Job()\n");
+    webclient::Job_Factory::Instance()->run_Job(p_job);
+}
+
+void webclient::Scheduler_Factory::Move_Job(webclient::Job *p_job)
+{
+    if(!p_job)
+    {
+        printf("%s:%s:%d p_job is NULL\n",__FILE__,__FUNCTION__,__LINE__);
+        return;
+    }
+    
+    printf("Scheduler_Factory Job_Factory::Instance()->move_Job()\n");
+    
+    webclient::Mutex_Factory::Instance()->condition_signal(
+        webclient::State_Factory::get_next_state(p_job->return_current_job_state()),
+        webclient::Job_Factory::Instance()->move_Job,
+        (void *)p_job);   
 }
 
 void webclient::Scheduler_Factory::stop()

@@ -32,12 +32,12 @@ private:
 public:
     static Mutex_Factory *Instance();
     void initialize();
-    void condition_wait(uint8_t mutex_id,
-        void (*p_call_back_function)(void*),
+    void* condition_wait(uint8_t mutex_id,
+        void* (*p_call_back_function)(void*),
         void *p_job);
     void condition_signal(uint8_t mutex_id,
-        void (*p_call_back_function)(uint8_t),
-        uint8_t state_id);   
+        void (*p_call_back_function)(void*),
+        void *p_job);   
 };
 }
 

@@ -21,8 +21,10 @@ class Scheduler_Factory {
     uint32_t remote_ipv4_address);
    void run();
    void stop();
-   void Process_this_Job(webclient::Job *p_job);
-
+   static void Perform_a_Job(uint8_t state_id);
+   static void* Dequeue_Job(void *p_state);
+   static void Execute_Job(webclient::Job *p_job);
+   static void Move_Job(webclient::Job *p_job);
 };
 }
 #endif

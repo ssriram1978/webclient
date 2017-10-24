@@ -1,8 +1,5 @@
 #include "ThreadFactory.h"
 #include "StateFactory.h"
-#include "MutexFactory.h"
-#include "QueueFactory.h"
-#include "Job.h"
 #include "SchedulerFactory.h"
 
 extern int is_webclient_alive();
@@ -45,33 +42,6 @@ webclient::Thread_Factory::~Thread_Factory()
     }
 }
 
-void webclient::Thread_Factory::dequeue_and_process_job(void *arg)
-{
-    uint64_t thread_data = -1;
-    uint8_t thread_id = -1;
-    
-    thread_data = (uint64_t) arg;
-    thread_id = (uint8_t) thread_data;
-    
-    while(!webclient::Queue_Factory::Instance()->is_empty(thread_id))
-    {
-        webclient::Job *p_job = (webclient::Job *) calloc(1,sizeof(webclient::Job));
-        webclient::uint32_t length = 0;
-        
-        webclient::Queue_Factory::Instance()->dequeue(thread_id,
-                (void **)&p_job,
-                &length);
-
-        printf("%s:%s:%d p_job=%p,length=%d\n",__FILE__,__FUNCTION__,__LINE__,
-           p_job,length);
-   
-        //Call Scheduler factory to process the job.        
-        webclient::Scheduler_Factory::Instance()->Process_this_Job(p_job);
-    }
-    
-    return;
-}
-
 void *webclient::Thread_Factory::thread_main_job(void *arg)
 {
     uint64_t thread_data = -1;
@@ -103,9 +73,7 @@ void *webclient::Thread_Factory::thread_main_job(void *arg)
    
    while(is_webclient_alive())
    {
-        webclient::Mutex_Factory::Instance()->condition_wait(thread_id,
-                webclient::Thread_Factory::dequeue_and_process_job,
-                arg);
+        webclient::Scheduler_Factory::Perform_a_Job(thread_id);
    }
    
    printf("%s thread exiting",thread_name.c_str());
@@ -133,7 +101,10 @@ void webclient::Thread_Factory::Initialize_Thread_Factory()
        pthread_t *pthread_ptr = (pthread_t *)calloc(1,sizeof(pthread_t));
        pthread_var->thread_array_var.push_back(pthread_ptr);
        pthread_var->total_number_of_pthreads++;
-       printf("Incrementing total number of pthreads to %d\n",pthread_var->total_number_of_pthreads);
+       printf("%s:%d For state(%d),Incrementing total number of pthreads to %d\n",
+               __FUNCTION__,__LINE__,
+               index,
+               pthread_var->total_number_of_pthreads);
        
        webclient::Thread_Factory::thread_var[index]=pthread_var;
        
