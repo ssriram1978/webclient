@@ -53,7 +53,7 @@ void webclient::Job_Factory::Enqueue_All_Jobs_to_specified_queue(void *p_queue_i
     
     if(queue_id < 0 || queue_id > webclient::State_Factory::get_total_number_of_states())
     {
-        printf("%s:%d  Input parameters are invalid.\n",__FUNCTION__,__LINE__);
+        VLOG_ERROR("%s:%d  Input parameters are invalid.\n",__FUNCTION__,__LINE__);
         return;
     }
     
@@ -63,7 +63,7 @@ void webclient::Job_Factory::Enqueue_All_Jobs_to_specified_queue(void *p_queue_i
 
            if(p_job)
            {
-                printf("\n%s:%d queue_id=%d\n",__FUNCTION__,__LINE__,
+                VLOG_DEBUG("\n%s:%d queue_id=%d\n",__FUNCTION__,__LINE__,
                        queue_id);
                 webclient::Queue_Factory::Instance()->enqueue(queue_id,
                       (void *)p_job,sizeof(webclient::Job));
@@ -83,7 +83,7 @@ void webclient::Job_Factory::move_Job(void *p_job)
    
    if(!p_job_obj)
    {
-       printf("%s:%d  Input parameter(p_job) is invalid.\n",__FUNCTION__,__LINE__);
+       VLOG_ERROR("%s:%d  Input parameter(p_job) is invalid.\n",__FUNCTION__,__LINE__);
        return;
    }
    
@@ -93,12 +93,12 @@ void webclient::Job_Factory::move_Job(void *p_job)
 
    if(next_state == init_state)
    {
-      printf("%s:%s:%d  Reached one loop of iteration..\n",__FILE__,__FUNCTION__,__LINE__);
+      VLOG_DEBUG("%s:%s:%d  Reached one loop of iteration..\n",__FILE__,__FUNCTION__,__LINE__);
       p_job_obj->increment_iteration_count();
    }
    
    p_job_obj->set_current_job_state(next_state);
-   printf("%s:%s:%d  Setting next state \
+   VLOG_DEBUG("%s:%s:%d  Setting next state \
    to=%d..\n",__FILE__,__FUNCTION__,__LINE__,
            p_job_obj->return_current_job_state());
 

@@ -17,6 +17,8 @@
 #include <netinet/in.h>
 #include <sys/socket.h>
 #include <unistd.h>
+#include "Log.h"
+
 namespace webclient {
 
 using namespace std;

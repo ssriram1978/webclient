@@ -87,7 +87,7 @@ uint8_t webclient::State_Factory::run_job_on_this_current_state(uint8_t state,vo
 {
    if(state <0 || state >= SOCKET_STATE_MAX)
    {
-      printf("%s:%d  Input parameters are invalid.\n",__FILE__,__LINE__);
+      VLOG_ERROR("%s:%d  Input parameters are invalid.\n",__FILE__,__LINE__);
       return -1;
    }
 
@@ -101,7 +101,7 @@ uint8_t webclient::State_Factory::get_next_state(uint8_t current_state)
    
    if(current_state <0 || current_state >= SOCKET_STATE_MAX)
    {
-      printf("%s:%d  Input parameters are invalid.\n",__FILE__,__LINE__);
+      VLOG_ERROR("%s:%d  Input parameters are invalid.\n",__FILE__,__LINE__);
       return -1;
    }
 

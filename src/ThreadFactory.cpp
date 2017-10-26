@@ -51,7 +51,7 @@ void *webclient::Thread_Factory::thread_main_job(void *arg)
      
     if(!arg)
     {
-       printf("%s:%d Argument is NULL.Returning...\n",__FUNCTION__,__LINE__);
+       VLOG_ERROR("%s:%d Argument is NULL.Returning...\n",__FUNCTION__,__LINE__);
        return 0;
     }
 
@@ -64,7 +64,7 @@ void *webclient::Thread_Factory::thread_main_job(void *arg)
    
    thread_name = webclient::State_Factory::convert_state_to_name(thread_id);
    
-   printf("%s:%d tid=%ld,thread_id=%d,thread_name=%s\n",
+   VLOG_DEBUG("%s:%d tid=%ld,thread_id=%d,thread_name=%s\n",
            __FUNCTION__,__LINE__,tid,thread_id,thread_name.c_str());
    
    pthread_setname_np(pthread_self(),
@@ -76,7 +76,7 @@ void *webclient::Thread_Factory::thread_main_job(void *arg)
         webclient::Scheduler_Factory::Perform_a_Job(thread_id);
    }
    
-   printf("%s thread exiting",thread_name.c_str());
+   VLOG_DEBUG("%s thread exiting",thread_name.c_str());
    
    return NULL;
 }
@@ -89,7 +89,7 @@ void webclient::Thread_Factory::Initialize_Thread_Factory()
             
     if(total_number_of_threads < 0)
     {
-        printf("\nInvalid number of states");
+        VLOG_ERROR("\nInvalid number of states");
         return;
     }
     
@@ -101,7 +101,7 @@ void webclient::Thread_Factory::Initialize_Thread_Factory()
        pthread_t *pthread_ptr = (pthread_t *)calloc(1,sizeof(pthread_t));
        pthread_var->thread_array_var.push_back(pthread_ptr);
        pthread_var->total_number_of_pthreads++;
-       printf("%s:%d For state(%d),Incrementing total number of pthreads to %d\n",
+       VLOG_DEBUG("%s:%d For state(%d),Incrementing total number of pthreads to %d\n",
                __FUNCTION__,__LINE__,
                index,
                pthread_var->total_number_of_pthreads);

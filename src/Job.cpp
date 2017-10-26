@@ -11,7 +11,7 @@ void webclient::Job::set_Job(uint16_t local_port,uint32_t local_ipv4,uint32_t re
 
 void webclient::Job::print_Job()
 {
-    printf("%s:%s:%d local_port=%d,local_ipv4=%d,remote_ipv4=%d,current_state=%d,total_no_of_iter=%ld.\n"
+    VLOG_DEBUG("%s:%s:%d local_port=%d,local_ipv4=%d,remote_ipv4=%d,current_state=%d,total_no_of_iter=%ld.\n"
             ,__FILE__,__FUNCTION__,__LINE__,
             this->local_port,
             this->local_ipv4,

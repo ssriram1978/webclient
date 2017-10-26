@@ -37,14 +37,14 @@ void webclient::Scheduler_Factory::initialize(
 {
 
    //State Factory is already initialized. (All static functions)
-   printf("%s:%s:%d State_Factory::Instance()->get_total_number_of_states() returned %d\n",
+   VLOG_DEBUG("%s:%s:%d State_Factory::Instance()->get_total_number_of_states() returned %d\n",
            __FILE__,__FUNCTION__,__LINE__,
            webclient::State_Factory::get_total_number_of_states());
 
    //Initialize Queue Factory
    webclient::Queue_Factory::Instance()->set_total_number_of_queues(webclient::State_Factory::get_total_number_of_states());
 
-   printf("%s:%s:%d queue::Instance()->is_empty(1) returned \
+   VLOG_DEBUG("%s:%s:%d queue::Instance()->is_empty(1) returned \
    %d\n",__FILE__,__FUNCTION__,__LINE__,
            webclient::Queue_Factory::Instance()->is_empty(1));
 
@@ -93,7 +93,7 @@ void webclient::Scheduler_Factory::run()
     uint8_t state = webclient::State_Factory::get_init_state();
     uint64_t *ptr_to_state = (uint64_t *) &state;    
     
-    printf("\n%s:%s:%d Going to enqueue all jobs to the first state (%d)\n",
+    VLOG_DEBUG("\n%s:%s:%d Going to enqueue all jobs to the first state (%d)\n",
             __FILE__,__FUNCTION__,__LINE__,
            state);
     
@@ -111,7 +111,7 @@ void webclient::Scheduler_Factory::Perform_a_Job(uint8_t state_id)
 {
     uint64_t *ptr_to_state = (uint64_t *) &state_id;
     
-    printf("\n%s:%s:%d Before invoking condition_wait(). state=(%d)\n",
+    VLOG_DEBUG("\n%s:%s:%d Before invoking condition_wait(). state=(%d)\n",
             __FILE__,__FUNCTION__,__LINE__,
            state_id);
     webclient::Job *p_job = (webclient::Job *) webclient::Mutex_Factory::Instance()->condition_wait(
@@ -120,7 +120,7 @@ void webclient::Scheduler_Factory::Perform_a_Job(uint8_t state_id)
                 (void *)*ptr_to_state);    
     if(p_job)
     {
-        printf("\n%s:%s:%d Found a job. state=(%d)\n",
+        VLOG_DEBUG("\n%s:%s:%d Found a job. state=(%d)\n",
             __FILE__,__FUNCTION__,__LINE__,
            state_id);
         Scheduler_Factory::Execute_Job(p_job);
@@ -128,7 +128,7 @@ void webclient::Scheduler_Factory::Perform_a_Job(uint8_t state_id)
     }
     else
     {
-        printf("\n%s:%s:%d p_job is NULL. state=(%d)\n",
+        VLOG_DEBUG("\n%s:%s:%d p_job is NULL. state=(%d)\n",
             __FILE__,__FUNCTION__,__LINE__,
            state_id);
     }
@@ -144,12 +144,12 @@ void* webclient::Scheduler_Factory::Dequeue_Job(void *p_state)
     if(state_id < webclient::State_Factory::get_init_state() ||
        state_id > webclient::State_Factory::get_total_number_of_states())
     {
-        printf("\n%s:%d Invalid input parameter\n",
+        VLOG_ERROR("\n%s:%d Invalid input parameter\n",
                 __FUNCTION__,__LINE__);
         return p_job;
     }
     
-    printf("%s:%s:%d state=%d,is_empty=%d\n",__FILE__,__FUNCTION__,__LINE__,
+    VLOG_DEBUG("%s:%s:%d state=%d,is_empty=%d\n",__FILE__,__FUNCTION__,__LINE__,
            state_id,webclient::Queue_Factory::Instance()->is_empty(state_id));
     
     if(!webclient::Queue_Factory::Instance()->is_empty(state_id))
@@ -161,12 +161,12 @@ void* webclient::Scheduler_Factory::Dequeue_Job(void *p_state)
                 (void **)&p_job,
                 &length);
 
-        printf("%s:%s:%d p_job=%p,length=%d\n",__FILE__,__FUNCTION__,__LINE__,
+        VLOG_DEBUG("%s:%s:%d p_job=%p,length=%d\n",__FILE__,__FUNCTION__,__LINE__,
            p_job,length);
     }
     else
     {
-        printf("%s:%s:%d state=%d. Queue is empty.\n",__FILE__,__FUNCTION__,__LINE__,
+        VLOG_DEBUG("%s:%s:%d state=%d. Queue is empty.\n",__FILE__,__FUNCTION__,__LINE__,
            state_id);
     }
     
@@ -177,11 +177,11 @@ void webclient::Scheduler_Factory::Execute_Job(webclient::Job *p_job)
 {
     if(!p_job)
     {
-        printf("%s:%s:%d p_job is NULL\n",__FILE__,__FUNCTION__,__LINE__);
+        VLOG_ERROR("%s:%s:%d p_job is NULL\n",__FILE__,__FUNCTION__,__LINE__);
         return;
     }
     
-    printf("Scheduler_Factory Job_Factory::Instance()->run_Job()\n");
+    VLOG_DEBUG("Scheduler_Factory Job_Factory::Instance()->run_Job()\n");
     webclient::Job_Factory::Instance()->run_Job(p_job);
 }
 
@@ -189,11 +189,11 @@ void webclient::Scheduler_Factory::Move_Job(webclient::Job *p_job)
 {
     if(!p_job)
     {
-        printf("%s:%s:%d p_job is NULL\n",__FILE__,__FUNCTION__,__LINE__);
+        VLOG_ERROR("%s:%s:%d p_job is NULL\n",__FILE__,__FUNCTION__,__LINE__);
         return;
     }
     
-    printf("Scheduler_Factory Job_Factory::Instance()->move_Job()\n");
+    VLOG_DEBUG("Scheduler_Factory Job_Factory::Instance()->move_Job()\n");
     
     webclient::Mutex_Factory::Instance()->condition_signal(
         webclient::State_Factory::get_next_state(p_job->return_current_job_state()),

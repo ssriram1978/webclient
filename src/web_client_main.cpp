@@ -16,7 +16,7 @@ int is_webclient_alive()
 
 void INThandler(int dummy) 
 {
-    printf("INThandler: Exiting...\n");
+    VLOG_ERROR("INThandler: Exiting...\n");
     time_to_exit = 1;
 }
 
@@ -26,7 +26,7 @@ void print_job_details(void *p_job_details)
     
     if(!p_job)
     {
-        printf("%s:%s:%d Invalid job details.\n",__FILE__,__FUNCTION__,__LINE__);
+        VLOG_ERROR("%s:%s:%d Invalid job details.\n",__FILE__,__FUNCTION__,__LINE__);
         return;
     }
     
@@ -35,39 +35,41 @@ void print_job_details(void *p_job_details)
 
 void socket_creator(void *p_job_details)
 {
-   printf("%s:%s:%d\n",__FILE__,__FUNCTION__,__LINE__);
+   VLOG_NOTICE("%s:%s:%d\n",__FILE__,__FUNCTION__,__LINE__);
    print_job_details(p_job_details);
    
 }
 
 void socket_connect(void *p_job_details)
 {
-   printf("%s:%s:%d\n",__FILE__,__FUNCTION__,__LINE__);
+   VLOG_NOTICE("%s:%s:%d\n",__FILE__,__FUNCTION__,__LINE__);
    print_job_details(p_job_details);
 }
     
 void socket_writer(void *p_job_details)
 {
-   printf("%s:%s:%d\n",__FILE__,__FUNCTION__,__LINE__);
+   VLOG_NOTICE("%s:%s:%d\n",__FILE__,__FUNCTION__,__LINE__);
    print_job_details(p_job_details);
 }
     
 void socket_reader(void *p_job_details)
 {
-   printf("%s:%s:%d\n",__FILE__,__FUNCTION__,__LINE__);
+   VLOG_NOTICE("%s:%s:%d\n",__FILE__,__FUNCTION__,__LINE__);
    print_job_details(p_job_details);
 }
     
 void socket_destroyer(void *p_job_details)
 {
-   printf("%s:%s:%d\n",__FILE__,__FUNCTION__,__LINE__);
+   VLOG_NOTICE("%s:%s:%d\n",__FILE__,__FUNCTION__,__LINE__);
    print_job_details(p_job_details);
 }
 
 int main()
 {
    signal(SIGINT, INThandler);
- 
+   initializeLogParameters("WEBCLIENT");
+   setLogLevel("ERROR");
+   
    webclient::Scheduler_Factory::Instance()->initialize(1,5,123456,123456);
    webclient::Thread_Factory::Instance()->Initialize_Thread_Factory();   
      

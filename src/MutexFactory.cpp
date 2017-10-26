@@ -68,12 +68,12 @@ void webclient::Mutex_Factory::initialize()
             
     if(total_number_of_mutex < 0)
     {
-        printf("\n%s:%d  Invalid number of states(%d)\n",
+        VLOG_ERROR("\n%s:%d  Invalid number of states(%d)\n",
                 __FUNCTION__,__LINE__,total_number_of_mutex);
         return;
     }
     
-    printf("%s:%d total_number_of_mutex=%d\n",
+    VLOG_DEBUG("%s:%d total_number_of_mutex=%d\n",
             __FUNCTION__,__LINE__,total_number_of_mutex);
     
     for(int index=0; index < total_number_of_mutex; index++)
@@ -96,7 +96,7 @@ void webclient::Mutex_Factory::condition_signal(uint8_t state_type,
     if(state_type < webclient::State_Factory::get_init_state() ||
        state_type > webclient::State_Factory::get_total_number_of_states())
     {
-        printf("\n%s:%d state=%d Invalid input parameter\n",
+        VLOG_ERROR("\n%s:%d state=%d Invalid input parameter\n",
                 __FUNCTION__,__LINE__,state_type);
         return;
     }
@@ -106,7 +106,7 @@ void webclient::Mutex_Factory::condition_signal(uint8_t state_type,
     
     if(!p_mutex || !p_cond)
     {
-        printf("\n%s:%d Unable to find mutex/cond for this state=%d\n",
+        VLOG_ERROR("\n%s:%d Unable to find mutex/cond for this state=%d\n",
                 __FUNCTION__,__LINE__,state_type);
         return;
     }   
@@ -115,24 +115,24 @@ void webclient::Mutex_Factory::condition_signal(uint8_t state_type,
     status = pthread_mutex_lock(p_mutex);
     if (status != 0)
     {
-        printf("%s:%d state=%d pthread_mutex_lock failed\n",
+        VLOG_ERROR("%s:%d state=%d pthread_mutex_lock failed\n",
                 __FUNCTION__,__LINE__,state_type);
         return;
     }
 
     //Execute the callback function
-    printf("%s:%d state=%d Executing the callback function.\n",
+    VLOG_DEBUG("%s:%d state=%d Executing the callback function.\n",
             __FUNCTION__,__LINE__,state_type);
     
     (*p_call_back_function)(p_job);
 
-    printf("%s:%d state=%d Invoking pthread_cond_signal()\n",
+    VLOG_DEBUG("%s:%d state=%d Invoking pthread_cond_signal()\n",
             __FUNCTION__,__LINE__,state_type);
 
     status = pthread_cond_signal(p_cond);
     if (status != 0)
     {
-        printf("%s:%d state=%d pthread_cond_wait failed\n",
+        VLOG_ERROR("%s:%d state=%d pthread_cond_wait failed\n",
                 __FUNCTION__,__LINE__,state_type);
         return;
     }
@@ -140,7 +140,7 @@ void webclient::Mutex_Factory::condition_signal(uint8_t state_type,
     status = pthread_mutex_unlock(p_mutex);
     if (status != 0)
     {
-        printf("%s:%d state=%d pthread_mutex_unlock failed\n",
+        VLOG_ERROR("%s:%d state=%d pthread_mutex_unlock failed\n",
                 __FUNCTION__,__LINE__,state_type);
         return;
     }
@@ -156,7 +156,7 @@ void* webclient::Mutex_Factory::condition_wait(uint8_t state_type,
     if(state_type < webclient::State_Factory::get_init_state() ||
        state_type > webclient::State_Factory::get_total_number_of_states())
     {
-        printf("\n%s:%d state=%d Invalid input parameter\n",
+        VLOG_ERROR("\n%s:%d state=%d Invalid input parameter\n",
                 __FUNCTION__,__LINE__,state_type);
         return return_argument;
     }
@@ -166,7 +166,7 @@ void* webclient::Mutex_Factory::condition_wait(uint8_t state_type,
     
     if(!p_mutex || !p_cond)
     {
-        printf("\n%s:%d state=%d Unable to find mutex/cond.\n",
+        VLOG_ERROR("\n%s:%d state=%d Unable to find mutex/cond.\n",
                 __FUNCTION__,__LINE__,state_type);
         return return_argument;
     }   
@@ -175,24 +175,24 @@ void* webclient::Mutex_Factory::condition_wait(uint8_t state_type,
     status = pthread_mutex_lock(p_mutex);
     if (status != 0)
     {
-        printf("%s:%d state=%d pthread_mutex_lock failed\n",
+        VLOG_ERROR("%s:%d state=%d pthread_mutex_lock failed\n",
                 __FUNCTION__,__LINE__,state_type);
         return return_argument;
     }
     
-    printf("%s:%d state=%d Invoking pthread_cond_wait()\n",
+    VLOG_DEBUG("%s:%d state=%d Invoking pthread_cond_wait()\n",
             __FUNCTION__,__LINE__,state_type);
     
     status = pthread_cond_wait(p_cond,p_mutex);
     if (status != 0)
     {
-        printf("%s:%d state=%d pthread_cond_wait failed\n",
+        VLOG_ERROR("%s:%d state=%d pthread_cond_wait failed\n",
                 __FUNCTION__,__LINE__,state_type);
         return return_argument;
     }
     
     //Execute the callback function
-    printf("%s:%d state=%d Executing the callback function.\n",
+    VLOG_DEBUG("%s:%d state=%d Executing the callback function.\n",
             __FUNCTION__,__LINE__,state_type);
     
     return_argument = (*p_call_back_function)(p_job);
@@ -200,7 +200,7 @@ void* webclient::Mutex_Factory::condition_wait(uint8_t state_type,
     status = pthread_mutex_unlock(p_mutex);
     if (status != 0)
     {
-        printf("%s:%d state=%d pthread_mutex_unlock failed\n",
+        VLOG_ERROR("%s:%d state=%d pthread_mutex_unlock failed\n",
                 __FUNCTION__,__LINE__,state_type);
         return return_argument;
     }

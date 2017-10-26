@@ -19,6 +19,7 @@ LDFLAGS +=    -lpthread \
 web_client_c_sources = \
 
 web_client_cpp_sources = \
+	src/Log.cpp \
         src/QueueFactory.cpp \
         src/StateFactory.cpp \
         src/Job.cpp \

@@ -32,7 +32,7 @@ void webclient::Queue_Factory::set_total_number_of_queues(uint8_t queue_total)
 {
    if(!queue_total)
    {
-      printf("%s:%d Invalid input parameters.\n",__FILE__,__LINE__);
+      VLOG_ERROR("%s:%d Invalid input parameters.\n",__FILE__,__LINE__);
       return;
    }
 
@@ -54,13 +54,13 @@ uint8_t webclient::Queue_Factory::enqueue(uint8_t queue_type,
        (queue_type <0) ||
        (queue_type >=total_number_of_queues))
     {
-       printf("%s:%d Invalid input parameters.\n",__FILE__,__LINE__);
+       VLOG_ERROR("%s:%d Invalid input parameters.\n",__FILE__,__LINE__);
        return msq_send_return_code;
     }
 
     if(!(p_g_msgQ+queue_type))
     {
-       printf("%s:%d p_g_msgQ is not initialized for %d.\n",__FILE__,__LINE__,queue_type);
+       VLOG_ERROR("%s:%d p_g_msgQ is not initialized for %d.\n",__FILE__,__LINE__,queue_type);
        return msq_send_return_code;
     }
     
@@ -68,7 +68,7 @@ uint8_t webclient::Queue_Factory::enqueue(uint8_t queue_type,
     
     if (temp == NULL)
     {
-       printf("%s:%d  Unable to allocate memory for msgq_node\n",__FILE__,__LINE__);
+       VLOG_ERROR("%s:%d  Unable to allocate memory for msgq_node\n",__FILE__,__LINE__);
        return msq_send_return_code;
     }
     
@@ -107,19 +107,19 @@ void webclient::Queue_Factory::dequeue(uint8_t queue_type, void **ppMessage, uin
        (queue_type <0) ||
        (queue_type >=total_number_of_queues))
    {
-      printf("%s:%d  Input parameters are invalid.\n",__FILE__,__LINE__);
+      VLOG_ERROR("%s:%d  Input parameters are invalid.\n",__FILE__,__LINE__);
       return;
    }
 
    if(!(p_g_msgQ+queue_type))
    {
-       printf("%s:%d p_g_msgQ is not initialized for %d.\n",__FILE__,__LINE__,queue_type);
+       VLOG_ERROR("%s:%d p_g_msgQ is not initialized for %d.\n",__FILE__,__LINE__,queue_type);
        return;
    }
     
    if ((p_g_msgQ+queue_type)->pFront==NULL)
    {
-      printf("%s:%d  No messages in messaqe queue\n",__FILE__,__LINE__);
+      VLOG_ERROR("%s:%d  No messages in messaqe queue\n",__FILE__,__LINE__);
       return;
    }
    
@@ -141,13 +141,13 @@ uint8_t webclient::Queue_Factory::is_empty(uint8_t queue_type)
    if ((queue_type <0) ||
        (queue_type >=total_number_of_queues))
    {
-      printf("%s:%d  Input parameters are invalid.\n",__FILE__,__LINE__);
+      VLOG_ERROR("%s:%d  Input parameters are invalid.\n",__FILE__,__LINE__);
       return are_there_messages_in_msgQ;
    }
 
    if(!(p_g_msgQ+queue_type))
    {
-       printf("%s:%d p_g_msgQ is not initialized for %d.\n",__FILE__,__LINE__,queue_type);
+       VLOG_ERROR("%s:%d p_g_msgQ is not initialized for %d.\n",__FILE__,__LINE__,queue_type);
        return are_there_messages_in_msgQ;
    }
    
@@ -164,13 +164,13 @@ webclient::uint64_t webclient::Queue_Factory::count(uint8_t queue_type)
     if ((queue_type <0) ||
         (queue_type >=total_number_of_queues))
     {
-       printf("%s:%d  Input parameters are invalid.\n",__FILE__,__LINE__);
+       VLOG_ERROR("%s:%d  Input parameters are invalid.\n",__FILE__,__LINE__);
        return -1;
     }
     
     if(!(p_g_msgQ+queue_type))
     {
-        printf("%s:%d p_g_msgQ is not initialized for %d.\n",__FILE__,__LINE__,queue_type);
+        VLOG_ERROR("%s:%d p_g_msgQ is not initialized for %d.\n",__FILE__,__LINE__,queue_type);
         return -1;
     }
     
