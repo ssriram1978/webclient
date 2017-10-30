@@ -18,6 +18,7 @@
 #include <sys/socket.h>
 #include <unistd.h>
 #include "Log.h"
+#include <errno.h> //For errno - the error number
 
 namespace webclient {
 
