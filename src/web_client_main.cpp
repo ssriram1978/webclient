@@ -5,6 +5,7 @@
 #include "SchedulerFactory.h"
 #include "StateFactory.h"
 #include "ThreadFactory.h"
+#include "stdin_cb.h"
 #include  <signal.h>
 
 unsigned char time_to_exit = 0;
@@ -64,13 +65,27 @@ void socket_destroyer(void *p_job_details)
    print_job_details(p_job_details);
 }
 
-int main()
+int main(int argc, char **argv)
 {
-   signal(SIGINT, INThandler);
-   initializeLogParameters("WEBCLIENT");
-   setLogLevel("ERROR");
+//    signal(SIGINT, INThandler);
+    initializeLogParameters("WEBCLIENT");
+    setLogLevel("NOTICE");
+    char threadName[10] = "MAIN";
+    pthread_setname_np(pthread_self(), threadName);
    
-   webclient::Scheduler_Factory::Instance()->initialize(1,5,123456,123456);
+    pthread_t pthread_var;
+    pthread_attr_t attr;
+
+    pthread_attr_init(&attr);
+    pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
+    
+    pthread_create(
+               &pthread_var, 
+               &attr, 
+               &stdin_cb_fn, 
+               NULL);
+
+   webclient::Scheduler_Factory::Instance()->initialize(1,200,123456,123456);
    webclient::Thread_Factory::Instance()->Initialize_Thread_Factory();   
      
 #if 0
