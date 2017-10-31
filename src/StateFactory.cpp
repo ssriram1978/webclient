@@ -1,3 +1,15 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
+/* 
+ * File:   StateFactory.cpp
+ * Author: ssridhar
+ * 
+ * Created on October 11, 2017, 1:06 PM
+ */
 #include "StateFactory.h"
 
 webclient::State_Factory::state_action webclient::State_Factory::state_action_var[] = 
@@ -44,7 +56,7 @@ std::string webclient::State_Factory::convert_state_to_name(uint8_t state_val)
         break;
 
         case webclient::State_Factory::SOCKET_DESTROYER:
-        state_name.assign("SOCKET_DESTROYER");
+        state_name.assign("SOCKET_DESTROY");
         break;
 
         case webclient::State_Factory::SOCKET_CREATOR:

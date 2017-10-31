@@ -1,3 +1,15 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
+/* 
+ * File:   QueueFactory.h
+ * Author: ssridhar
+ * 
+ * Created on October 11, 2017, 1:06 PM
+ */
 #ifndef QUEUE_FACTORY_H
 #define QUEUE_FACTORY_H
 
@@ -18,7 +30,7 @@ class Queue_Factory {
   {
      msgq_node *pFront;
      msgq_node *pRear;
-     uint64_t count;
+     long count;
   } msgQ;
  
   msgQ *p_g_msgQ;
@@ -31,14 +43,18 @@ class Queue_Factory {
   }
   
 public:
-
+   long count(uint8_t queue_type);
    ~Queue_Factory();
    uint8_t enqueue(uint8_t queue_type,void * message,uint32_t message_size);
    void dequeue(uint8_t queue_type,void **ppMessage, uint32_t *pMessageLength);
    uint8_t is_empty(uint8_t queue_type);
-   webclient::uint64_t count(uint8_t queue_type);
    void set_total_number_of_queues(uint8_t queue_total);
+   void peek_at_the_front_of_queue(uint8_t queue_type, 
+   void **ppMessage, 
+   uint32_t *pMessageLength,
+   long location);
    static Queue_Factory* Instance();
+   static long return_current_queue_count(void *arg);
 };
 }
 

@@ -1,3 +1,15 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
+/* 
+ * File:   namespace.h
+ * Author: ssridhar
+ * 
+ * Created on October 11, 2017, 1:06 PM
+ */
 #ifndef NAMESPACE_H
 #define NAMESPACE_H
 
@@ -19,6 +31,13 @@
 #include <unistd.h>
 #include "Log.h"
 #include <errno.h> //For errno - the error number
+
+#include <map>
+#include <vector>
+
+#include <sys/timeb.h>
+#include <string>
+#include <syscall.h>
 
 namespace webclient {
 

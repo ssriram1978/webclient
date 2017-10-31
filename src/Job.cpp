@@ -1,3 +1,15 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
+/* 
+ * File:   Job.cpp
+ * Author: ssridhar
+ * 
+ * Created on October 11, 2017, 1:06 PM
+ */
 #include "Job.h"
 
 void webclient::Job::set_Job(uint16_t local_port,uint32_t local_ipv4,uint32_t remote_ipv4)
@@ -11,7 +23,7 @@ void webclient::Job::set_Job(uint16_t local_port,uint32_t local_ipv4,uint32_t re
 
 void webclient::Job::print_Job()
 {
-    VLOG_NOTICE("%s:%s:%d local_port=%d,local_ipv4=%d,remote_ipv4=%d,current_state=%d,total_no_of_iter=%ld.\n"
+    VLOG_NOTICE("%s:%s:%d local_port=%d,local_ipv4=0x%08x,remote_ipv4=0x%08x,current_state=%d,total_no_of_iter=%ld.\n"
             ,__FILE__,__FUNCTION__,__LINE__,
             this->local_port,
             this->local_ipv4,

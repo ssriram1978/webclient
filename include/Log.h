@@ -14,11 +14,13 @@
 #ifndef LOG_H
 #define LOG_H
 
-#include <stdio.h>
+//#include <stdio.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+//#ifdef __cplusplus
+//extern "C" {
+//#endif
+
+#include "namespace.h"
 
 #define STR(x) #x
 #define XSTR(x) STR(x)
@@ -37,7 +39,7 @@ typedef enum {
    LOGLEVEL_VERBOSE
 }LogLevel;
 
-static LogLevel gCommonLogLevel = LOGLEVEL_NOTICE;
+static LogLevel gCommonLogLevel = LOGLEVEL_ERROR;
 
 #define PROCESS_NAME_LEN     25
 #define PROCESS_ID_LEN       25
@@ -146,9 +148,9 @@ void logErrorText(const char* level, const char* message);
 void initializeLogParameters(const char *processname);
 void setLogLevel(const char*);
 
-#ifdef __cplusplus
-}
-#endif
+//#ifdef __cplusplus
+//}
+//#endif
 
 #endif /* LOG_H */
 

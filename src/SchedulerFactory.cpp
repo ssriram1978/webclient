@@ -1,3 +1,15 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
+/* 
+ * File:   SchedulerFactory.cpp
+ * Author: ssridhar
+ * 
+ * Created on October 11, 2017, 1:06 PM
+ */
 #include "SchedulerFactory.h"
 #include "QueueFactory.h"
 #include "StateFactory.h"
@@ -44,9 +56,9 @@ void webclient::Scheduler_Factory::initialize(
    //Initialize Queue Factory
    webclient::Queue_Factory::Instance()->set_total_number_of_queues(webclient::State_Factory::get_total_number_of_states());
 
-   VLOG_DEBUG("%s:%s:%d queue::Instance()->is_empty(1) returned \
-   %d\n",__FILE__,__FUNCTION__,__LINE__,
-           webclient::Queue_Factory::Instance()->is_empty(1));
+   //VLOG_DEBUG("%s:%s:%d queue::Instance()->is_empty(1) returned
+   //%d\n",__FILE__,__FUNCTION__,__LINE__,
+   //       webclient::Queue_Factory::Instance()->is_empty(1)); 
 
       //Initialize Job Factory
    webclient::Job_Factory::Instance()->create_Jobs(starting_port,ending_port,local_ipv4_address,remote_ipv4_address);
@@ -154,7 +166,8 @@ void* webclient::Scheduler_Factory::Dequeue_Job(void *p_state)
     
     if(!webclient::Queue_Factory::Instance()->is_empty(state_id))
     {
-        p_job = (webclient::Job *) calloc(1,sizeof(webclient::Job));
+        //p_job = (webclient::Job *) calloc(1,sizeof(webclient::Job));
+        p_job = NULL;
         webclient::uint32_t length = 0;
         
         webclient::Queue_Factory::Instance()->dequeue(state_id,
@@ -195,8 +208,10 @@ void webclient::Scheduler_Factory::Move_Job(webclient::Job *p_job)
     
     VLOG_DEBUG("Scheduler_Factory Job_Factory::Instance()->move_Job()\n");
     
+    uint8_t next_state = webclient::State_Factory::get_next_state(p_job->return_current_job_state());
+    
     webclient::Mutex_Factory::Instance()->condition_signal(
-        webclient::State_Factory::get_next_state(p_job->return_current_job_state()),
+        next_state,
         webclient::Job_Factory::Instance()->move_Job,
         (void *)p_job);   
 }
@@ -205,4 +220,3 @@ void webclient::Scheduler_Factory::stop()
 {
     //Delete all the Jobs from all the queues.
 }
-

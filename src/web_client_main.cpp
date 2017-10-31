@@ -1,3 +1,15 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
+/* 
+ * File:   web_client_main.cpp
+ * Author: ssridhar
+ * 
+ * Created on October 11, 2017, 1:06 PM
+ */
 #include "namespace.h"
 #include "Job.h"
 #include "JobFactory.h"
@@ -112,20 +124,20 @@ int hostname_to_ip(const char *hostname, char *service, char *ip, uint32_t ip_le
 
 uint32_t convert_domain_name_to_ip_address(char *pCedIPAddr)
 {
-   char nCedIPAddr[256];
+   char nIPAddr[256];
    int hname_lkup_rc = 0;
    uint32_t ipaddress = -1;
 
    if(strlen(pCedIPAddr) < DOMAIN_NAME_ADDRESS_MAX)
    {
-        hname_lkup_rc = hostname_to_ip(pCedIPAddr, NULL, nCedIPAddr, sizeof(nCedIPAddr));
+        hname_lkup_rc = hostname_to_ip(pCedIPAddr, NULL, nIPAddr, sizeof(nIPAddr));
         if(hname_lkup_rc != 0) 
         {
             VLOG_ERROR("IP name resolution failure... exiting\n");
             exit(2);
         }
       
-        int s = inet_pton(AF_INET, nCedIPAddr, &ipaddress);
+        int s = inet_pton(AF_INET, nIPAddr, &ipaddress);
         if (s <= 0) 
         {
             if (s == 0)
@@ -201,7 +213,7 @@ int main(int argc, char **argv)
 
             case 'h':
             default:
-                VLOG_ERROR("options: [-d <dbglvl>] [-s <starting port>] [-e <ending port>] [-l <local ipaddr>] [-r <remote ip or domain name>]\n");
+                VLOG_ERROR("options: [-d <dbglvl 0-DEBUG,1-INFO,2-NOTICE,3-ERROR>] [-s <starting port>] [-e <ending port>] [-l <local ipaddr>] [-r <remote ip or domain name>]\n");
                 exit(EXIT_FAILURE);
                 break;
         }
@@ -218,7 +230,13 @@ int main(int argc, char **argv)
                &attr, 
                &stdin_cb_fn, 
                NULL);
-
+    
+    printf("local_starting_port=%d,local_ending_port=%d,local_ip_address=%08x,remote_ip_address=%08x",
+            local_starting_port,
+            local_ending_port,
+            local_ip_address,
+            remote_ip_address);
+    
    webclient::Scheduler_Factory::Instance()->initialize(
             local_starting_port,
             local_ending_port,

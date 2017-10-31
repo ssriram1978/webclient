@@ -29,6 +29,7 @@ web_client_cpp_sources = \
         src/ThreadFactory.cpp \
         src/web_client_main.cpp \
 	src/stdin_cb.cpp \
+	src/one_second_timer.cpp \
         
 
 web_client_c_objects=$(web_client_c_sources:%.c=%.o)

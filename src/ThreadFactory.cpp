@@ -1,3 +1,15 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
+/* 
+ * File:   ThreadFactory.cpp
+ * Author: ssridhar
+ * 
+ * Created on October 31, 2017, 1:06 PM
+ */
 #include "ThreadFactory.h"
 #include "StateFactory.h"
 #include "SchedulerFactory.h"
@@ -64,7 +76,7 @@ void *webclient::Thread_Factory::thread_main_job(void *arg)
    
    thread_name = webclient::State_Factory::convert_state_to_name(thread_id);
    
-   VLOG_DEBUG("%s:%d tid=%ld,thread_id=%d,thread_name=%s\n",
+   VLOG_NOTICE("%s:%d tid=%ld,thread_id=%d,thread_name=%s\n",
            __FUNCTION__,__LINE__,tid,thread_id,thread_name.c_str());
    
    pthread_setname_np(pthread_self(),

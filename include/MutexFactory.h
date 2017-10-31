@@ -13,8 +13,7 @@
 
 #ifndef MUTEX_FACTORY_H
 #define MUTEX_FACTORY_H
-#include <map>
-#include <pthread.h>
+#include "namespace.h"
 
 namespace webclient 
 {

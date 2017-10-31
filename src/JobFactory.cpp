@@ -1,3 +1,15 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
+/* 
+ * File:   JobFactory.cpp
+ * Author: ssridhar
+ * 
+ * Created on October 11, 2017, 1:06 PM
+ */
 #include "JobFactory.h"
 #include "StateFactory.h"
 #include "QueueFactory.h"
@@ -31,7 +43,7 @@ void webclient::Job_Factory::create_Jobs(
     uint32_t local_ipv4_address,
     uint32_t remote_ipv4_address)
 {
-   webclient::Job_Factory::total_number_of_jobs=ending_port-starting_port;
+   webclient::Job_Factory::total_number_of_jobs=ending_port-starting_port+1;
    
    webclient::Job_Factory::p_jobs = (webclient::Job *) calloc(total_number_of_jobs,sizeof(webclient::Job));
 

@@ -4,15 +4,15 @@
  * and open the template in the editor.
  */
 
+/* 
+ * File:   Log.cpp
+ * Author: ssridhar
+ * 
+ * Created on October 11, 2017, 1:06 PM
+ */
+
 #include <Log.h>
-#include <iostream>
-#include <unistd.h>
-#include <sys/timeb.h>
-#include <string.h>
-#include <string>
-#include <map>
-#include <pthread.h>
-#include <syscall.h>
+
 
 using namespace std;
 
@@ -95,7 +95,7 @@ void setLogLevel(const char* level)
     auto it = loglevels.find(level);
     if (it != loglevels.end()) {
         gCommonLogLevel = loglevels[level];
-        VLOG_INIT("Log level set to: [%s : %d]", level, gCommonLogLevel);
+        printf("Log level set to: [%s : %d]", level, gCommonLogLevel);
     } else {
         VLOG_ERROR("Failed to set log level to %s", level);
     }
