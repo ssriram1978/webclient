@@ -42,6 +42,7 @@ webclient::Queue_Factory::~Queue_Factory()
     }
 }
 
+#define QUEUE_CURRENT_COUNT "current-queue-count-"
 
 void webclient::Queue_Factory::set_total_number_of_queues(uint8_t queue_total)
 {
@@ -53,10 +54,15 @@ void webclient::Queue_Factory::set_total_number_of_queues(uint8_t queue_total)
 
    p_g_msgQ=(msgQ *)calloc(queue_total,sizeof(msgQ));
    total_number_of_queues=queue_total;
+   
+   //Register for one second timer event callback.
    for(int count=0; count < total_number_of_queues; count++)
    {
+       std::string str_count(QUEUE_CURRENT_COUNT);
+       str_count.append(webclient::State_Factory::convert_state_to_name(count));
+       
        one_second_timer_factory::Instance()->register_for_one_second_timer(
-        webclient::State_Factory::convert_state_to_name(count),
+        str_count,
         webclient::Queue_Factory::Instance()->return_current_queue_count);   
    }
    
@@ -80,7 +86,10 @@ long webclient::Queue_Factory::return_current_queue_count(void *arg)
             index < webclient::State_Factory::get_total_number_of_states();
             index++)
     {
-        if (p_queue_name->compare(webclient::State_Factory::convert_state_to_name(index)) == 0)
+        std::string str_count(QUEUE_CURRENT_COUNT);
+        str_count.append(webclient::State_Factory::convert_state_to_name(index));
+        
+        if (p_queue_name->compare(str_count) == 0)
         {
             match_found=1;
             break;

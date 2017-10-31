@@ -13,6 +13,7 @@
 #include "ThreadFactory.h"
 #include "StateFactory.h"
 #include "SchedulerFactory.h"
+#include "one_second_timer.h"
 
 extern int is_webclient_alive();
 
@@ -54,6 +55,8 @@ webclient::Thread_Factory::~Thread_Factory()
     }
 }
 
+#define THREAD_PROCESSING_COUNT "thread-processing-count-"
+
 void *webclient::Thread_Factory::thread_main_job(void *arg)
 {
     uint64_t thread_data = -1;
@@ -82,7 +85,14 @@ void *webclient::Thread_Factory::thread_main_job(void *arg)
    pthread_setname_np(pthread_self(),
            thread_name.c_str());
    
-   
+   //Register for one second timer event callback.
+   std::string str_count(THREAD_PROCESSING_COUNT);
+   str_count.append(thread_name);
+       
+   one_second_timer_factory::Instance()->register_for_one_second_timer(
+   str_count,
+   webclient::Thread_Factory::Instance()->return_current_thread_count);   
+
    while(is_webclient_alive())
    {
         webclient::Scheduler_Factory::Perform_a_Job(thread_id);
@@ -91,6 +101,42 @@ void *webclient::Thread_Factory::thread_main_job(void *arg)
    VLOG_DEBUG("%s thread exiting",thread_name.c_str());
    
    return NULL;
+}
+
+long webclient::Thread_Factory::return_current_thread_count(void *arg)
+{
+    std::string *p_thread_name=(std::string *) arg;
+    long return_value = -1;
+    
+    if(!arg)
+    {
+        VLOG_ERROR("%s:%d Invalid input parameters.\n",__FILE__,__LINE__);
+        return return_value;
+    }
+    
+    uint8_t match_found = 0;
+    int index=0;
+    
+    for(index=0; 
+            index < webclient::State_Factory::get_total_number_of_states();
+            index++)
+    {
+        std::string str_count(THREAD_PROCESSING_COUNT);
+        str_count.append(webclient::State_Factory::convert_state_to_name(index));
+        
+        if (p_thread_name->compare(str_count) == 0)
+        {
+            match_found=1;
+            break;
+        }
+    }
+    
+    if(match_found)
+    {
+        //return_value = webclient::Thread_Factory::Instance()->count(index);
+    }
+    
+    return return_value;
 }
 
 void webclient::Thread_Factory::Initialize_Thread_Factory()

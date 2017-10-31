@@ -40,6 +40,7 @@ namespace webclient {
         void Add_more_threads(uint8_t thread_identifier);
         void Delete_threads(uint8_t thread_identifier);
         virtual ~Thread_Factory();
+        static long return_current_thread_count(void *arg);
     };
 }
 
