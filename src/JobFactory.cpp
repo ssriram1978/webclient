@@ -41,7 +41,8 @@ void webclient::Job_Factory::create_Jobs(
     uint16_t starting_port,
     uint16_t ending_port,
     uint32_t local_ipv4_address,
-    uint32_t remote_ipv4_address)
+    uint32_t remote_ipv4_address,
+    char remote_address[])
 {
    webclient::Job_Factory::total_number_of_jobs=ending_port-starting_port+1;
    
@@ -53,7 +54,10 @@ void webclient::Job_Factory::create_Jobs(
 
       if(p_job)
       {
-         p_job->set_Job(starting_port+index,local_ipv4_address,remote_ipv4_address);
+         p_job->set_Job(starting_port+index,
+                 local_ipv4_address,
+                 remote_ipv4_address,
+                 remote_address);
       }
    }
 }

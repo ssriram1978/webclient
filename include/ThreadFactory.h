@@ -19,11 +19,12 @@ namespace webclient {
     class Thread_Factory {        
     private:
         typedef std::vector<pthread_t*> Pthread_array;
-        
+        typedef std::vector<long> Running_count_of_jobs;
         typedef struct __pthread_variables
         {
             uint8_t total_number_of_pthreads;            
             Pthread_array thread_array_var;
+            Running_count_of_jobs current_job_count;
         }Pthread_variables;
         
         typedef std::map<uint8_t,Pthread_variables*> Thread_map;

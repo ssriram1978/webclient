@@ -14,7 +14,7 @@
 #define STATE_FACTORY_H
 
 #include "namespace.h"
-
+#include "WebClient.h"
 extern void socket_creator(void *);
 extern void socket_connect(void *);
 extern void socket_writer(void *);

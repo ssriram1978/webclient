@@ -11,28 +11,29 @@
  * Created on October 11, 2017, 1:06 PM
  */
 #include "StateFactory.h"
+#include "WebClient.h"
 
 webclient::State_Factory::state_action webclient::State_Factory::state_action_var[] = 
 {
    {
        webclient::State_Factory::SOCKET_CONNECT,
-       socket_creator
+       webclient::WebClientFactory::socket_creator
    },
    {
        webclient::State_Factory::SOCKET_WRITER,
-       socket_connect
+       webclient::WebClientFactory::socket_connect
    },
    { 
        webclient::State_Factory::SOCKET_READER,
-       socket_writer
+       webclient::WebClientFactory::socket_writer
    },
    {
        webclient::State_Factory::SOCKET_DESTROYER,
-        socket_reader
+       webclient::WebClientFactory::socket_reader
    },
    {
        webclient::State_Factory::SOCKET_CREATOR,
-       socket_destroyer
+       webclient::WebClientFactory::socket_destroyer
    },
 };
 

@@ -30,6 +30,7 @@ web_client_cpp_sources = \
         src/web_client_main.cpp \
 	src/stdin_cb.cpp \
 	src/one_second_timer.cpp \
+	src/WebClient.cpp
         
 
 web_client_c_objects=$(web_client_c_sources:%.c=%.o)

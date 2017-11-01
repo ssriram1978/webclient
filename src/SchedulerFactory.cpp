@@ -15,7 +15,7 @@
 #include "StateFactory.h"
 #include "JobFactory.h"
 #include "MutexFactory.h"
-
+#include "one_second_timer.h"
 
 webclient::Scheduler_Factory* webclient::Scheduler_Factory::m_pInstance = NULL;
 
@@ -41,11 +41,14 @@ webclient::Scheduler_Factory* webclient::Scheduler_Factory::Instance()
     return m_pInstance;
 }
 
+#define SCHEDULER_JOB "SCHEDULER_JOB-"
+
 void webclient::Scheduler_Factory::initialize(
     uint16_t starting_port,
     uint16_t ending_port,
     uint32_t local_ipv4_address,
-    uint32_t remote_ipv4_address)
+    uint32_t remote_ipv4_address,
+    char remote_address[])
 {
 
    //State Factory is already initialized. (All static functions)
@@ -54,15 +57,45 @@ void webclient::Scheduler_Factory::initialize(
            webclient::State_Factory::get_total_number_of_states());
 
    //Initialize Queue Factory
-   webclient::Queue_Factory::Instance()->set_total_number_of_queues(webclient::State_Factory::get_total_number_of_states());
+   webclient::Queue_Factory::Instance()->set_total_number_of_queues(
+   webclient::State_Factory::get_total_number_of_states());
 
    //VLOG_DEBUG("%s:%s:%d queue::Instance()->is_empty(1) returned
    //%d\n",__FILE__,__FUNCTION__,__LINE__,
    //       webclient::Queue_Factory::Instance()->is_empty(1)); 
 
       //Initialize Job Factory
-   webclient::Job_Factory::Instance()->create_Jobs(starting_port,ending_port,local_ipv4_address,remote_ipv4_address);
+   webclient::Job_Factory::Instance()->create_Jobs(starting_port,
+                                                   ending_port,
+                                                   local_ipv4_address,
+                                                   remote_ipv4_address,
+                                                   remote_address);
 
+   //Register for one second timer event callback.
+   for (int index=0; 
+           index < webclient::State_Factory::get_total_number_of_states(); 
+           index++)
+   {
+        long count=0;
+        std::string str_count(SCHEDULER_JOB);
+        str_count.append("dequeue_count-");
+        str_count.append(webclient::State_Factory::convert_state_to_name(index));
+        enqueue_job_count.push_back(count);
+        one_second_timer_factory::Instance()->register_for_one_second_timer(
+        str_count,
+        webclient::Scheduler_Factory::Instance()->return_current_dequeue_done_count);   
+
+        std::string str_count2(SCHEDULER_JOB);
+        str_count2.append("enqueue_count-");
+        str_count2.append(webclient::State_Factory::convert_state_to_name(index));
+        dequeue_job_count.push_back(count);
+        
+        one_second_timer_factory::Instance()->register_for_one_second_timer(
+        str_count2,
+        webclient::Scheduler_Factory::Instance()->return_current_enqueue_done_count);   
+   }
+
+   
 #if 0  
    webclient::Queue_Factory::Instance()->enqueue(1,(void *)"sriram",strlen("sriram"));
 
@@ -99,6 +132,101 @@ void webclient::Scheduler_Factory::initialize(
    //Initialize Thread Factory   
 }
 
+long webclient::Scheduler_Factory::return_current_dequeue_done_count(void *arg)
+{
+    std::string *p_thread_name=(std::string *) arg;
+    long return_value = -1;
+    
+    if(!arg)
+    {
+        VLOG_ERROR("%s:%d Invalid input parameters.\n",__FILE__,__LINE__);
+        return return_value;
+    }
+    
+    uint8_t match_found = 0;
+    int index=0;
+    
+    for(index=0; 
+            index < webclient::State_Factory::get_total_number_of_states();
+            index++)
+    {
+        std::string str_count(SCHEDULER_JOB);
+        str_count.append("dequeue_count-");
+        str_count.append(webclient::State_Factory::convert_state_to_name(index));
+        
+        if (p_thread_name->compare(str_count) == 0)
+        {
+            match_found=1;
+            break;
+        }
+    }
+    
+    if(match_found)
+    {
+#if 0
+        webclient::Thread_Factory::Pthread_variables *p_thread_var = 
+                webclient::Thread_Factory::Instance()->thread_var[index];
+              
+        if(p_thread_var)
+        {
+           return_value = p_thread_var->current_job_count[index];
+           p_thread_var->current_job_count[index] = 0;
+        }
+#endif      
+        return_value = webclient::Scheduler_Factory::Instance()->dequeue_job_count[index];
+        webclient::Scheduler_Factory::Instance()->dequeue_job_count[index]=0;
+    }
+    
+    return return_value;
+}
+
+long webclient::Scheduler_Factory::return_current_enqueue_done_count(void *arg)
+{
+    std::string *p_thread_name=(std::string *) arg;
+    long return_value = -1;
+    
+    if(!arg)
+    {
+        VLOG_ERROR("%s:%d Invalid input parameters.\n",__FILE__,__LINE__);
+        return return_value;
+    }
+    
+    uint8_t match_found = 0;
+    int index=0;
+    
+    for(index=0; 
+            index < webclient::State_Factory::get_total_number_of_states();
+            index++)
+    {
+        std::string str_count(SCHEDULER_JOB);
+        str_count.append("enqueue_count-");
+        str_count.append(webclient::State_Factory::convert_state_to_name(index));
+        
+        if (p_thread_name->compare(str_count) == 0)
+        {
+            match_found=1;
+            break;
+        }
+    }
+    
+    if(match_found)
+    {
+#if 0        
+        webclient::Thread_Factory::Pthread_variables *p_thread_var = 
+                webclient::Thread_Factory::Instance()->thread_var[index];
+              
+        if(p_thread_var)
+        {
+           return_value = p_thread_var->current_job_count[index];
+           p_thread_var->current_job_count[index] = 0;
+        }
+#endif
+        return_value = webclient::Scheduler_Factory::Instance()->enqueue_job_count[index];
+        webclient::Scheduler_Factory::Instance()->enqueue_job_count[index]=0;
+    }
+    
+    return return_value;
+}
 
 void webclient::Scheduler_Factory::run()
 {
@@ -135,6 +263,7 @@ void webclient::Scheduler_Factory::Perform_a_Job(uint8_t state_id)
         VLOG_DEBUG("\n%s:%s:%d Found a job. state=(%d)\n",
             __FILE__,__FUNCTION__,__LINE__,
            state_id);
+        webclient::Scheduler_Factory::Instance()->dequeue_job_count[state_id]+=1;
         Scheduler_Factory::Execute_Job(p_job);
         Scheduler_Factory::Move_Job(p_job);
     }
@@ -214,6 +343,7 @@ void webclient::Scheduler_Factory::Move_Job(webclient::Job *p_job)
         next_state,
         webclient::Job_Factory::Instance()->move_Job,
         (void *)p_job);   
+    webclient::Scheduler_Factory::Instance()->enqueue_job_count[p_job->return_current_job_state()]+=1;
 }
 
 void webclient::Scheduler_Factory::stop()

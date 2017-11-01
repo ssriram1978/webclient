@@ -33,50 +33,6 @@ void INThandler(int dummy)
     time_to_exit = 1;
 }
 
-void print_job_details(void *p_job_details)
-{
-    webclient::Job *p_job = (webclient::Job *) p_job_details;
-    
-    if(!p_job)
-    {
-        VLOG_ERROR("%s:%s:%d Invalid job details.\n",__FILE__,__FUNCTION__,__LINE__);
-        return;
-    }
-    
-    p_job->print_Job();
-}
-
-void socket_creator(void *p_job_details)
-{
-   VLOG_NOTICE("%s:%s:%d\n",__FILE__,__FUNCTION__,__LINE__);
-   print_job_details(p_job_details);
-   
-}
-
-void socket_connect(void *p_job_details)
-{
-   VLOG_NOTICE("%s:%s:%d\n",__FILE__,__FUNCTION__,__LINE__);
-   print_job_details(p_job_details);
-}
-    
-void socket_writer(void *p_job_details)
-{
-   VLOG_NOTICE("%s:%s:%d\n",__FILE__,__FUNCTION__,__LINE__);
-   print_job_details(p_job_details);
-}
-    
-void socket_reader(void *p_job_details)
-{
-   VLOG_NOTICE("%s:%s:%d\n",__FILE__,__FUNCTION__,__LINE__);
-   print_job_details(p_job_details);
-}
-    
-void socket_destroyer(void *p_job_details)
-{
-   VLOG_NOTICE("%s:%s:%d\n",__FILE__,__FUNCTION__,__LINE__);
-   print_job_details(p_job_details);
-}
-
 int hostname_to_ip(const char *hostname, char *service, char *ip, uint32_t ip_len)    
 {                                                                               
     //int sockfd;                                                                 
@@ -122,15 +78,15 @@ int hostname_to_ip(const char *hostname, char *service, char *ip, uint32_t ip_le
 
 #define DOMAIN_NAME_ADDRESS_MAX 256
 
-uint32_t convert_domain_name_to_ip_address(char *pCedIPAddr)
+uint32_t convert_domain_name_to_ip_address(char *p_IPAddr)
 {
    char nIPAddr[256];
    int hname_lkup_rc = 0;
    uint32_t ipaddress = -1;
 
-   if(strlen(pCedIPAddr) < DOMAIN_NAME_ADDRESS_MAX)
+   if(strlen(p_IPAddr) < DOMAIN_NAME_ADDRESS_MAX)
    {
-        hname_lkup_rc = hostname_to_ip(pCedIPAddr, NULL, nIPAddr, sizeof(nIPAddr));
+        hname_lkup_rc = hostname_to_ip(p_IPAddr, NULL, nIPAddr, sizeof(nIPAddr));
         if(hname_lkup_rc != 0) 
         {
             VLOG_ERROR("IP name resolution failure... exiting\n");
@@ -153,7 +109,7 @@ uint32_t convert_domain_name_to_ip_address(char *pCedIPAddr)
 #define ENDING_PORT 64000
 #define LOCAL_IP 0xfefefefe
 #define REMOTE_IP 0xfefe1234
-
+#define MAX_REMOTE_ADDRESS_LEN 200
 int main(int argc, char **argv)
 {
 //    signal(SIGINT, INThandler);
@@ -164,6 +120,7 @@ int main(int argc, char **argv)
     uint16_t local_ending_port=ENDING_PORT;
     uint32_t local_ip_address=LOCAL_IP;
     uint32_t remote_ip_address=REMOTE_IP;
+    char remote_address[MAX_REMOTE_ADDRESS_LEN];
     char c = '\0';
     
     while ((c = getopt(argc, argv, "d:s:e:l:r:t:")) != -1) 
@@ -208,8 +165,16 @@ int main(int argc, char **argv)
                 break;
             
             case 'r':
-                remote_ip_address = convert_domain_name_to_ip_address(optarg);
-                break;
+            {
+                char *p_IPAddr = (char *)optarg;
+                if(p_IPAddr && strlen(p_IPAddr) < MAX_REMOTE_ADDRESS_LEN)
+                {
+                    memset(remote_address,0,MAX_REMOTE_ADDRESS_LEN);
+                    memcpy(remote_address,p_IPAddr,strlen(p_IPAddr));
+                    remote_ip_address = convert_domain_name_to_ip_address(optarg);
+                }
+            }
+            break;
 
             case 'h':
             default:
@@ -231,17 +196,19 @@ int main(int argc, char **argv)
                &stdin_cb_fn, 
                NULL);
     
-    printf("local_starting_port=%d,local_ending_port=%d,local_ip_address=%08x,remote_ip_address=%08x",
+    printf("local_starting_port=%d,local_ending_port=%d,local_ip_address=%08x,remote_ip_address=%08x,remote_address=%s",
             local_starting_port,
             local_ending_port,
             local_ip_address,
-            remote_ip_address);
+            remote_ip_address,
+            remote_address);
     
    webclient::Scheduler_Factory::Instance()->initialize(
             local_starting_port,
             local_ending_port,
             local_ip_address,
-            remote_ip_address);
+            remote_ip_address,
+            remote_address);
    
    webclient::Thread_Factory::Instance()->Initialize_Thread_Factory();   
      
