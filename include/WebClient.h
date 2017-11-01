@@ -21,11 +21,11 @@ namespace webclient {
         void print_job_details(void *p_job_details);
         static WebClientFactory *p_web_client_factory;
     public:
-        static void socket_creator(void *p_job_details);
-        static void socket_connect(void *p_job_details);
-        static void socket_writer(void *p_job_details);
-        static void socket_reader(void *p_job_details);
-        static void socket_destroyer(void *p_job_details);
+        static int socket_creator(void *p_job_details);
+        static int socket_connect(void *p_job_details);
+        static int socket_writer(void *p_job_details);
+        static int socket_reader(void *p_job_details);
+        static int socket_destroyer(void *p_job_details);
         static WebClientFactory *Instance();
     };
 }

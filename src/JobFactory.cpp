@@ -87,10 +87,10 @@ void webclient::Job_Factory::Enqueue_All_Jobs_to_specified_queue(void *p_queue_i
     }
 }
 
-void webclient::Job_Factory::run_Job(webclient::Job *p_job_obj)
+int webclient::Job_Factory::run_Job(webclient::Job *p_job_obj)
 {
    uint8_t current_state = p_job_obj->return_current_job_state();
-   webclient::State_Factory::run_job_on_this_current_state(current_state,p_job_obj);
+   return webclient::State_Factory::run_job_on_this_current_state(current_state,p_job_obj);
 }
 
 void webclient::Job_Factory::move_Job(void *p_job)

@@ -40,7 +40,7 @@ class Scheduler_Factory {
    void stop();
    static void Perform_a_Job(uint8_t state_id);
    static void* Dequeue_Job(void *p_state);
-   static void Execute_Job(webclient::Job *p_job);
+   static int Execute_Job(webclient::Job *p_job);
    static void Move_Job(webclient::Job *p_job);
    static long return_current_dequeue_done_count(void *arg);
    static long return_current_enqueue_done_count(void *arg);

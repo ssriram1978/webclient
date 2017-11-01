@@ -38,7 +38,7 @@ class State_Factory {
        typedef struct __state_action 
         {
             uint8_t next_state;
-            void (*action_function)(void *p_job_details);
+            int (*action_function)(void *p_job_details);
         } state_action;
      
      static state_action state_action_var[SOCKET_STATE_MAX];
@@ -47,7 +47,7 @@ class State_Factory {
    public:
    static uint8_t get_total_number_of_states();
    static uint8_t get_init_state();
-   static uint8_t run_job_on_this_current_state(uint8_t state,void *p_job_details);
+   static int run_job_on_this_current_state(uint8_t state,void *p_job_details);
    static uint8_t get_next_state(uint8_t current_state);
    static std::string convert_state_to_name(uint8_t state_name);
 };

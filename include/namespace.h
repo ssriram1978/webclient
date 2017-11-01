@@ -12,7 +12,8 @@
  */
 #ifndef NAMESPACE_H
 #define NAMESPACE_H
-
+#define _XOPEN_SOURCE 700
+#define _BSD_SOURCE
 #include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
@@ -46,6 +47,9 @@ using namespace std;
 typedef unsigned char uint8_t;
 typedef unsigned int uint32_t;
 typedef unsigned long uint64_t;
+
+#define SUCCESS 1
+#define FAILURE 2
 
 }
 

@@ -40,13 +40,13 @@ void* webclient::one_second_timer_factory::one_sec_timer(void *args)
              iterator != webclient::one_second_timer_factory::Instance()->timer_map.end(); 
              ++iterator)
         {
-            //std::string name = iterator->first;
-            //call_back_fn_ptr fn_ptr=iterator->second;
+            std::string name = iterator->first;
+            call_back_fn_ptr fn_ptr=iterator->second;
              
-            //long return_value=(*fn_ptr)((void *)&name);
+            long return_value=(*fn_ptr)((void *)&name);
              
-            //printf("Invoking %s callback returned %ld\n",
-            //        name.c_str(),return_value);
+            printf("Invoking %s callback returned %ld\n",
+                    name.c_str(),return_value);
         }
 
         sleep(1);

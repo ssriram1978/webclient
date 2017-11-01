@@ -264,8 +264,17 @@ void webclient::Scheduler_Factory::Perform_a_Job(uint8_t state_id)
             __FILE__,__FUNCTION__,__LINE__,
            state_id);
         webclient::Scheduler_Factory::Instance()->dequeue_job_count[state_id]+=1;
-        Scheduler_Factory::Execute_Job(p_job);
-        Scheduler_Factory::Move_Job(p_job);
+        int return_code = Scheduler_Factory::Execute_Job(p_job);
+        if(return_code == SUCCESS)
+        {
+            Scheduler_Factory::Move_Job(p_job);
+        }
+        else
+        {
+            //Move all jobs to init state.
+            //Scheduler_Factory::run();
+        }
+        
     }
     else
     {
@@ -315,16 +324,16 @@ void* webclient::Scheduler_Factory::Dequeue_Job(void *p_state)
     return (void *)p_job;
 }
 
-void webclient::Scheduler_Factory::Execute_Job(webclient::Job *p_job)
+int webclient::Scheduler_Factory::Execute_Job(webclient::Job *p_job)
 {
     if(!p_job)
     {
         VLOG_ERROR("%s:%s:%d p_job is NULL\n",__FILE__,__FUNCTION__,__LINE__);
-        return;
+        return FAILURE;
     }
     
     VLOG_DEBUG("Scheduler_Factory Job_Factory::Instance()->run_Job()\n");
-    webclient::Job_Factory::Instance()->run_Job(p_job);
+    return webclient::Job_Factory::Instance()->run_Job(p_job);
 }
 
 void webclient::Scheduler_Factory::Move_Job(webclient::Job *p_job)

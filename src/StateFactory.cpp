@@ -96,7 +96,7 @@ uint8_t webclient::State_Factory::get_init_state()
 }
 
 
-uint8_t webclient::State_Factory::run_job_on_this_current_state(uint8_t state,void *p_job_details)
+int webclient::State_Factory::run_job_on_this_current_state(uint8_t state,void *p_job_details)
 {
    if(state <0 || state >= SOCKET_STATE_MAX)
    {
@@ -104,9 +104,7 @@ uint8_t webclient::State_Factory::run_job_on_this_current_state(uint8_t state,vo
       return -1;
    }
 
-   webclient::State_Factory::state_action_var[state].action_function(p_job_details);
-
-   return 0;
+   return webclient::State_Factory::state_action_var[state].action_function(p_job_details);;
 }
 
 uint8_t webclient::State_Factory::get_next_state(uint8_t current_state)

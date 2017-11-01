@@ -20,7 +20,9 @@ void webclient::Job::set_Job(uint16_t local_port,
    this->local_port=local_port;
    this->local_ipv4=local_ipv4;
    this->remote_ipv4=remote_ipv4;
-   int len_of_remote_address = sizeof(remote_address)/sizeof(char);
+   //int len_of_remote_address = sizeof(remote_address)/sizeof(remote_address[0]);
+   int len_of_remote_address = strlen(remote_address);
+   
    if(len_of_remote_address < MAX_REMOTE_DOMAIN_NAME)
    {
        memcpy(this->remote_domain_name,remote_address,len_of_remote_address);

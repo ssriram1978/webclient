@@ -44,7 +44,9 @@ void webclient::WebClientFactory::print_job_details(void *p_job_details)
     p_job->print_Job();
 }
 
-void webclient::WebClientFactory::socket_creator(void *p_job_details)
+#define PROTO_ENT_VAL 6
+
+int webclient::WebClientFactory::socket_creator(void *p_job_details)
 {      
     Job *p_job = (Job *)p_job_details;
     int optval; /* flag value for setsockopt */
@@ -53,21 +55,27 @@ void webclient::WebClientFactory::socket_creator(void *p_job_details)
     if(!p_job)
     {
         VLOG_ERROR("Invalid input parameters.\n");
-        return;
+        return FAILURE;
     }
     
     webclient::WebClientFactory::Instance()->print_job_details(p_job_details);
     
+    if (p_job->socket_file_descriptor > 0)
+    {
+        VLOG_NOTICE("Closing socket with fd=%d.\n",p_job->socket_file_descriptor);
+        p_job->socket_file_descriptor = 0;
+    }
+
     p_job->socket_file_descriptor=socket(AF_INET, SOCK_STREAM, 0);
     
     if (p_job->socket_file_descriptor < 0)
     {
         VLOG_ERROR("Error opening socket.\n");
-        return;
+        return FAILURE;
     }
     else
     {
-        VLOG_ERROR("Successfully opened socket with fd=%d.\n",p_job->socket_file_descriptor);
+        VLOG_DEBUG("Successfully opened socket with fd=%d.\n",p_job->socket_file_descriptor);
     }
    /* setsockopt: Handy debugging trick that lets 
     * us rerun the server immediately after we kill it; 
@@ -87,7 +95,8 @@ void webclient::WebClientFactory::socket_creator(void *p_job_details)
     clientaddr.sin_family = AF_INET;
 
     /* let the system figure out our IP address */
-    clientaddr.sin_addr.s_addr = htonl(p_job->local_ipv4);
+    //clientaddr.sin_addr.s_addr = htonl(p_job->local_ipv4);
+    memcpy(&clientaddr.sin_addr.s_addr,&p_job->local_ipv4,sizeof(in_addr_t));
 
     /* this is the port we will listen on */
     clientaddr.sin_port = htons((unsigned short)p_job->local_port);
@@ -96,20 +105,24 @@ void webclient::WebClientFactory::socket_creator(void *p_job_details)
     * bind: associate the parent socket with a port 
     */
     if (bind(p_job->socket_file_descriptor, (struct sockaddr *) &clientaddr, 
-	   sizeof(clientaddr)) < 0)
+	   sizeof(struct sockaddr_in)) < 0)
     {
         VLOG_ERROR("ERROR on binding.%d\n",p_job->socket_file_descriptor);
+        perror("bind failed. Error");
+        return FAILURE;
     }
     else
     {
-        VLOG_ERROR("Successfully binded ip=%d,port=%d for fd=%d.\n",
+        VLOG_DEBUG("Successfully binded ip=%08x:%08x,port=%d for fd=%d.\n",
                 p_job->local_ipv4,
+                clientaddr.sin_addr.s_addr,
                 p_job->local_port,
-                p_job->socket_file_descriptor);
+                p_job->socket_file_descriptor);        
     }
+    return SUCCESS;
 }
 
-void webclient::WebClientFactory::socket_connect(void *p_job_details)
+int webclient::WebClientFactory::socket_connect(void *p_job_details)
 {
     //VLOG_NOTICE("%s:%s:%d\n",__FILE__,__FUNCTION__,__LINE__);
     Job *p_job = (Job *)p_job_details;
@@ -118,7 +131,7 @@ void webclient::WebClientFactory::socket_connect(void *p_job_details)
     if(!p_job)
     {
         VLOG_ERROR("Invalid input parameters.\n");
-        return;
+        return FAILURE;
     }
     
     webclient::WebClientFactory::Instance()->print_job_details(p_job_details);
@@ -126,37 +139,45 @@ void webclient::WebClientFactory::socket_connect(void *p_job_details)
     if (p_job->socket_file_descriptor < 0)
     {
         VLOG_ERROR("socket_file_descriptor is less than 0.\n");
-        return;
+        return FAILURE;
     }
     
     /* build the server's Internet address */
     bzero((char *) &serveraddr, sizeof(serveraddr));
     serveraddr.sin_family = AF_INET;
-    serveraddr.sin_addr.s_addr=htonl(p_job->remote_ipv4);
+    //serveraddr.sin_addr.s_addr=htonl(p_job->remote_ipv4);
+    memcpy(&serveraddr.sin_addr.s_addr,&p_job->remote_ipv4,sizeof(in_addr_t));
+    
     uint16_t server_port = 80;
     serveraddr.sin_port = htons(server_port);
 
     /* connect: create a connection with the server */
-    if (connect(p_job->socket_file_descriptor, 
+    int return_code = connect(p_job->socket_file_descriptor, 
             (struct sockaddr *)&serveraddr, 
-            sizeof(serveraddr)) < 0) 
+            sizeof(struct sockaddr_in));
+    
+    if ( return_code< 0) 
     {
-        VLOG_ERROR("fd=%d,ERROR connecting server ip=%08x.\n",
+        VLOG_ERROR("fd=%d,ERROR connecting server ip=%08x:%08x.rc=%d\n",
                 p_job->socket_file_descriptor,
-                p_job->remote_ipv4);
-        return;
+                p_job->remote_ipv4,
+                serveraddr.sin_addr.s_addr,
+                return_code);
+        perror("connect failed. Error");
+        return FAILURE;
     }
     else
     {
-        VLOG_ERROR("Successfully connected to remote ip=%d for fd=%d.\n",
+        VLOG_DEBUG("Successfully connected to remote ip=%d for fd=%d.\n",
                 p_job->remote_ipv4,
                 p_job->socket_file_descriptor);
     }
+    return SUCCESS;
 }
 
 #define MAX_REQUEST_LEN 200
     
-void webclient::WebClientFactory::socket_writer(void *p_job_details)
+int webclient::WebClientFactory::socket_writer(void *p_job_details)
 {
     Job *p_job = (Job *)p_job_details;
     ssize_t nbytes_total, nbytes_last;
@@ -167,7 +188,7 @@ void webclient::WebClientFactory::socket_writer(void *p_job_details)
     if(!p_job)
     {
         VLOG_ERROR("Invalid input parameters.\n");
-        return;
+        return FAILURE;
     }
     
     webclient::WebClientFactory::Instance()->print_job_details(p_job_details);
@@ -175,7 +196,7 @@ void webclient::WebClientFactory::socket_writer(void *p_job_details)
     if (p_job->socket_file_descriptor < 0)
     {
         VLOG_ERROR("socket_file_descriptor is less than 0.\n");
-        return;
+        return FAILURE;
     }
    
    /* Send HTTP request. */
@@ -193,10 +214,8 @@ void webclient::WebClientFactory::socket_writer(void *p_job_details)
     if (request_len >= MAX_REQUEST_LEN) 
     {
         VLOG_ERROR("request length large: %d\n", request_len);
-        return;
+        return FAILURE;
     }
-    
-    printf("request_len=%d.\n",request_len);
     
     while (nbytes_total < request_len) 
     {
@@ -206,19 +225,21 @@ void webclient::WebClientFactory::socket_writer(void *p_job_details)
         if (nbytes_last == -1) 
         {
             VLOG_ERROR("write failed.\n");
-            return;            
+            return FAILURE;            
         }
         else
         {
-            VLOG_ERROR("Successfully write to remote ip=%s for fd=%d.\n",
+            VLOG_DEBUG("Successfully wrote %s to remote ip=%s for fd=%d.\n",
+                request,
                 p_job->remote_domain_name,
                 p_job->socket_file_descriptor);
         }
         nbytes_total += nbytes_last;
     }
+    return SUCCESS;
 }
     
-void webclient::WebClientFactory::socket_reader(void *p_job_details)
+int webclient::WebClientFactory::socket_reader(void *p_job_details)
 {
     ssize_t nbytes_total=0;
     char buffer[BUFSIZ];
@@ -227,7 +248,7 @@ void webclient::WebClientFactory::socket_reader(void *p_job_details)
     if(!p_job)
     {
         VLOG_ERROR("Invalid input parameters.\n");
-        return;
+        return FAILURE;
     }
     
     webclient::WebClientFactory::Instance()->print_job_details(p_job_details);
@@ -235,7 +256,7 @@ void webclient::WebClientFactory::socket_reader(void *p_job_details)
     if (p_job->socket_file_descriptor < 0)
     {
         VLOG_ERROR("socket_file_descriptor is less than 0.\n");
-        return;
+        return FAILURE;
     }
     //VLOG_NOTICE("%s:%s:%d\n",__FILE__,__FUNCTION__,__LINE__);
     
@@ -251,25 +272,26 @@ void webclient::WebClientFactory::socket_reader(void *p_job_details)
     if (nbytes_total == -1) 
     {
         VLOG_ERROR("read failed.\n");
-        return;
+        return FAILURE;
         //exit(EXIT_FAILURE);
     }
     else
     {
-        VLOG_ERROR("Successfully read from remote ip=%s for fd=%d.\n",
+        VLOG_DEBUG("Successfully read from remote ip=%s for fd=%d.\n",
             p_job->remote_domain_name,
             p_job->socket_file_descriptor);
     }
+    return SUCCESS;
 }
     
-void webclient::WebClientFactory::socket_destroyer(void *p_job_details)
+int webclient::WebClientFactory::socket_destroyer(void *p_job_details)
 {
     Job *p_job = (Job *)p_job_details;
    
     if(!p_job)
     {
         VLOG_ERROR("Invalid input parameters.\n");
-        return;
+        return FAILURE;
     }
     
     webclient::WebClientFactory::Instance()->print_job_details(p_job_details);
@@ -277,8 +299,9 @@ void webclient::WebClientFactory::socket_destroyer(void *p_job_details)
     if (p_job->socket_file_descriptor < 0)
     {
         VLOG_ERROR("socket_file_descriptor is less than 0.\n");
-        return;
+        return FAILURE;
     }
     
     close(p_job->socket_file_descriptor);
+    return SUCCESS;
 }

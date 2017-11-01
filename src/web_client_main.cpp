@@ -105,7 +105,7 @@ uint32_t convert_domain_name_to_ip_address(char *p_IPAddr)
    return ipaddress;
 }
 
-#define STARTING_PORT 1024
+#define STARTING_PORT 1025
 #define ENDING_PORT 64000
 #define LOCAL_IP 0xfefefefe
 #define REMOTE_IP 0xfefe1234
