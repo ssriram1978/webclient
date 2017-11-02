@@ -61,6 +61,7 @@ void webclient::Queue_Factory::set_total_number_of_queues(uint8_t queue_total)
        std::string str_count(QUEUE_CURRENT_COUNT);
        str_count.append(webclient::State_Factory::convert_state_to_name(count));
        
+       VLOG_ERROR("Registering %s with one second timer.\n",str_count.c_str());
        one_second_timer_factory::Instance()->register_for_one_second_timer(
         str_count,
         webclient::Queue_Factory::Instance()->return_current_queue_count);   
@@ -99,6 +100,10 @@ long webclient::Queue_Factory::return_current_queue_count(void *arg)
     if(match_found)
     {
         return_value = webclient::Queue_Factory::Instance()->count(index);
+    }
+    else
+    {
+        VLOG_ERROR("Match not found for %s.\n",(*p_queue_name).c_str());
     }
     
     return return_value;

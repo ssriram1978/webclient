@@ -31,6 +31,7 @@ public:
     virtual ~one_second_timer_factory();
     void register_for_one_second_timer(std::string name,
         long (*fn_pointer)(void*));
+    uint8_t print_stats;
     
 };
 }

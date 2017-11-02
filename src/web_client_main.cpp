@@ -22,7 +22,7 @@
 
 unsigned char time_to_exit = 0;
 
-int is_webclient_alive()
+int webclient::is_webclient_alive()
 {
     return !time_to_exit;
 }
@@ -210,7 +210,7 @@ int main(int argc, char **argv)
             remote_ip_address,
             remote_address);
    
-   webclient::Thread_Factory::Instance()->Initialize_Thread_Factory();   
+     
      
 #if 0
    webclient::Job *p_job = (webclient::Job *) calloc(1,sizeof(webclient::Job));
@@ -232,11 +232,6 @@ int main(int argc, char **argv)
 #endif
    sleep(1);
    webclient::Scheduler_Factory::Instance()->run();
-   
-   while(!time_to_exit)
-   {
-      sleep(1);
-   }
    
    return 1;
 }

@@ -15,7 +15,7 @@
 #include "SchedulerFactory.h"
 #include "one_second_timer.h"
 
-extern int is_webclient_alive();
+//extern int is_webclient_alive();
 
 webclient::Thread_Factory* webclient::Thread_Factory::p_thread_factory = NULL;
 
@@ -95,7 +95,7 @@ void *webclient::Thread_Factory::thread_main_job(void *arg)
    str_count,
    webclient::Thread_Factory::Instance()->return_current_thread_count);   
 
-   while(is_webclient_alive())
+   while(webclient::is_webclient_alive())
    {
        webclient::Thread_Factory::Pthread_variables *p_thread_var = 
                webclient::Thread_Factory::Instance()->thread_var[thread_id];
@@ -148,12 +148,48 @@ long webclient::Thread_Factory::return_current_thread_count(void *arg)
               
         if(p_thread_var)
         {
-           return_value = p_thread_var->current_job_count[index];
-           p_thread_var->current_job_count[index] = 0;
+           //return_value = p_thread_var->current_job_count[index];
+           //p_thread_var->current_job_count[index] = 0;
         }
     }
     
     return return_value;
+}
+
+void webclient::Thread_Factory::Create_Thread(uint8_t index)
+{
+    pthread_attr_t attr;
+    uint64_t *p_l_thread_identifer = (uint64_t *) &index;
+    long running_count= 0;
+    pthread_t *pthread_ptr = (pthread_t *)calloc(1,sizeof(pthread_t));
+    Pthread_variables *pthread_var  = NULL;
+    
+    pthread_var = webclient::Thread_Factory::thread_var[index];
+    
+    if(!pthread_var)
+    {
+        pthread_var  = (Pthread_variables *)calloc(1,sizeof(Pthread_variables)); 
+    }
+    
+    pthread_var->thread_array_var.push_back(pthread_ptr);
+    pthread_var->current_job_count.push_back(running_count);
+    pthread_var->total_number_of_pthreads++;
+    
+    VLOG_ERROR("%s:%d For state(%d),Incrementing total number of pthreads to %d\n",
+        __FUNCTION__,__LINE__,
+        index,
+        pthread_var->total_number_of_pthreads);
+    
+    webclient::Thread_Factory::thread_var[index]=pthread_var;
+       
+    pthread_attr_init(&attr);
+    pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
+
+    pthread_create(
+        pthread_ptr, 
+        &attr, 
+        &webclient::Thread_Factory::thread_main_job, 
+        (void *)*p_l_thread_identifer);
 }
 
 void webclient::Thread_Factory::Initialize_Thread_Factory()
@@ -170,38 +206,30 @@ void webclient::Thread_Factory::Initialize_Thread_Factory()
     
     for(uint8_t index=0; index < total_number_of_threads; index++)
     {
-       pthread_attr_t attr;
-       uint64_t *p_l_thread_identifer = (uint64_t *) &index;
-       Pthread_variables *pthread_var  = (Pthread_variables *)calloc(1,sizeof(Pthread_variables)); 
-       long running_count= 0;
-       pthread_t *pthread_ptr = (pthread_t *)calloc(1,sizeof(pthread_t));
-       pthread_var->thread_array_var.push_back(pthread_ptr);
-       pthread_var->current_job_count.push_back(running_count);
-       pthread_var->total_number_of_pthreads++;
-       VLOG_DEBUG("%s:%d For state(%d),Incrementing total number of pthreads to %d\n",
-               __FUNCTION__,__LINE__,
-               index,
-               pthread_var->total_number_of_pthreads);
-       
-       webclient::Thread_Factory::thread_var[index]=pthread_var;
-       
-       pthread_attr_init(&attr);
-       pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
-
-       pthread_create(
-               pthread_ptr, 
-               &attr, 
-               &webclient::Thread_Factory::thread_main_job, 
-               (void *)*p_l_thread_identifer);
+        Create_Thread(index);
     }
 }
 
 void webclient::Thread_Factory::Add_more_threads(uint8_t thread_identifier)
 {
-    
+    Create_Thread(thread_identifier);
 }
 
 void webclient::Thread_Factory::Delete_threads(uint8_t thread_identifier)
 {
     
+}
+
+int webclient::Thread_Factory::return_total_number_of_threads_per_queue(uint8_t thread_identifier)
+{
+    Pthread_variables *pthread_var  = NULL;
+    pthread_var = webclient::Thread_Factory::thread_var[thread_identifier];
+    int total_number_of_threads_per_queue = 0;
+    
+    if(pthread_var)
+    {
+        total_number_of_threads_per_queue = pthread_var->total_number_of_pthreads;
+    }
+    
+    return total_number_of_threads_per_queue;
 }

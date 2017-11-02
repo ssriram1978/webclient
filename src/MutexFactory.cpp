@@ -110,7 +110,7 @@ void webclient::Mutex_Factory::condition_signal(uint8_t state_type,
     }   
     
     //wake up and dequeue this message when condition is signalled.
-    //status = pthread_mutex_lock(p_mutex);
+    status = pthread_mutex_lock(p_mutex);
     if (status != 0)
     {
         VLOG_ERROR("%s:%d state=%d pthread_mutex_lock failed\n",
@@ -118,16 +118,19 @@ void webclient::Mutex_Factory::condition_signal(uint8_t state_type,
         return;
     }
 
-    //Execute the callback function
-    VLOG_DEBUG("%s:%d state=%d Executing the callback function.\n",
+    if(p_call_back_function)
+    {
+        //Execute the callback function
+        VLOG_DEBUG("%s:%d state=%d Executing the callback function.\n",
             __FUNCTION__,__LINE__,state_type);
     
-    (*p_call_back_function)(p_job);
+        (*p_call_back_function)(p_job);
+    }
 
     VLOG_DEBUG("%s:%d state=%d Invoking pthread_cond_signal()\n",
             __FUNCTION__,__LINE__,state_type);
 
-    //status = pthread_cond_signal(p_cond);
+    status = pthread_cond_signal(p_cond);
     if (status != 0)
     {
         VLOG_ERROR("%s:%d state=%d pthread_cond_wait failed\n",
@@ -135,7 +138,7 @@ void webclient::Mutex_Factory::condition_signal(uint8_t state_type,
         return;
     }
     
-    //status = pthread_mutex_unlock(p_mutex);
+    status = pthread_mutex_unlock(p_mutex);
     if (status != 0)
     {
         VLOG_ERROR("%s:%d state=%d pthread_mutex_unlock failed\n",
@@ -170,7 +173,7 @@ void* webclient::Mutex_Factory::condition_wait(uint8_t state_type,
     }   
     
     //wake up and dequeue this message when condition is signalled.
-    //status = pthread_mutex_lock(p_mutex);
+    status = pthread_mutex_lock(p_mutex);
     if (status != 0)
     {
         VLOG_ERROR("%s:%d state=%d pthread_mutex_lock failed\n",
@@ -181,7 +184,7 @@ void* webclient::Mutex_Factory::condition_wait(uint8_t state_type,
     VLOG_DEBUG("%s:%d state=%d Invoking pthread_cond_wait()\n",
             __FUNCTION__,__LINE__,state_type);
     
-    //status = pthread_cond_wait(p_cond,p_mutex);
+    status = pthread_cond_wait(p_cond,p_mutex);
     if (status != 0)
     {
         VLOG_ERROR("%s:%d state=%d pthread_cond_wait failed\n",
@@ -195,7 +198,7 @@ void* webclient::Mutex_Factory::condition_wait(uint8_t state_type,
     
     return_argument = (*p_call_back_function)(p_job);
     
-    //status = pthread_mutex_unlock(p_mutex);
+    status = pthread_mutex_unlock(p_mutex);
     if (status != 0)
     {
         VLOG_ERROR("%s:%d state=%d pthread_mutex_unlock failed\n",

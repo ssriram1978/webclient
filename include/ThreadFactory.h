@@ -32,7 +32,7 @@ namespace webclient {
                 
         static void* thread_main_job(void *arg);
         static Thread_Factory *p_thread_factory;
-        
+        void Create_Thread(uint8_t index);
         Thread_Factory();
     
     public:
@@ -42,6 +42,7 @@ namespace webclient {
         void Delete_threads(uint8_t thread_identifier);
         virtual ~Thread_Factory();
         static long return_current_thread_count(void *arg);
+        int return_total_number_of_threads_per_queue(uint8_t thread_identifier);
     };
 }
 

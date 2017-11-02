@@ -16,6 +16,7 @@
 #include "JobFactory.h"
 #include "MutexFactory.h"
 #include "one_second_timer.h"
+#include "ThreadFactory.h"
 
 webclient::Scheduler_Factory* webclient::Scheduler_Factory::m_pInstance = NULL;
 
@@ -95,6 +96,8 @@ void webclient::Scheduler_Factory::initialize(
         webclient::Scheduler_Factory::Instance()->return_current_enqueue_done_count);   
    }
 
+   //Initialize thread factory.
+   webclient::Thread_Factory::Instance()->Initialize_Thread_Factory(); 
    
 #if 0  
    webclient::Queue_Factory::Instance()->enqueue(1,(void *)"sriram",strlen("sriram"));
@@ -228,6 +231,7 @@ long webclient::Scheduler_Factory::return_current_enqueue_done_count(void *arg)
     return return_value;
 }
 
+#define TOTAL_NUMBER_OF_MESSAGES_PER_THREAD 1000
 void webclient::Scheduler_Factory::run()
 {
     uint8_t state = webclient::State_Factory::get_init_state();
@@ -245,6 +249,50 @@ void webclient::Scheduler_Factory::run()
    //Enqueue all the Jobs to the queue listed on the first state.
    //webclient::Job_Factory::Instance()->Enqueue_All_Jobs_to_specified_queue(
    //webclient::State_Factory::get_init_state());
+    
+    while(is_webclient_alive())
+    {
+       //sleep(1);
+       //wake up all sleeping threads if their queue is not empty.
+        for(int index=webclient::State_Factory::get_init_state();
+                index < webclient::State_Factory::get_total_number_of_states();
+                index++)
+        {
+            if (!webclient::Queue_Factory::Instance()->is_empty(index))
+            {
+                webclient::Mutex_Factory::Instance()->condition_signal(
+                index,
+                NULL,
+                NULL);
+            }
+            
+            //Spawn new thread based upon the current queue count.
+            int current_queue_count = webclient::Queue_Factory::Instance()->count(index);
+            
+            if(current_queue_count > TOTAL_NUMBER_OF_MESSAGES_PER_THREAD)
+            {
+                int number_of_threads = current_queue_count/TOTAL_NUMBER_OF_MESSAGES_PER_THREAD;
+                int current_number_of_threads_per_queue = 
+                webclient::Thread_Factory::Instance()->return_total_number_of_threads_per_queue(index);
+
+                if(current_number_of_threads_per_queue < number_of_threads)
+                {
+                    VLOG_ERROR("For index=%d,current_queue_count=%d,number_of_threads=%d,current_number_of_threads_per_queue=%d.\n",
+                        index,
+                        current_queue_count,
+                        number_of_threads,
+                        current_number_of_threads_per_queue);
+                    
+                    for(int count=current_number_of_threads_per_queue;
+                            count < number_of_threads;
+                            count++)
+                    {
+                        webclient::Thread_Factory::Instance()->Add_more_threads(index);
+                    }
+                }
+            }            
+        }
+    }
 }
 
 void webclient::Scheduler_Factory::Perform_a_Job(uint8_t state_id)

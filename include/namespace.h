@@ -50,6 +50,7 @@ typedef unsigned long uint64_t;
 
 #define SUCCESS 1
 #define FAILURE 2
+extern int is_webclient_alive();
 
 }
 

@@ -7,7 +7,7 @@ top_srcdir = /home/ssridhar/git/webclient
 CFLAGS+= -g -Wall -Wformat-nonliteral -Wformat-security \
          -Wno-deprecated-declarations \
          -Iinclude \
-         #-DSINGLE_ROW_SET \
+	 #-DSINGLE_ROW_SET \
 
 CPPFLAGS+= -std=c++11 
 

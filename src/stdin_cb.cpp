@@ -14,15 +14,14 @@
 #include "QueueFactory.h"
 #include "StateFactory.h"
 #include "JobFactory.h"
-
-extern int is_webclient_alive();
+#include "one_second_timer.h"
 
 void* stdin_cb_fn(void *arg)
 {
     char threadName[10] = "STDIN_CB";
     pthread_setname_np(pthread_self(), threadName);
     
-    while(is_webclient_alive())
+    while(webclient::is_webclient_alive())
     {
         char input_command[100]={0};
         VLOG_EMERG("\nEnter your command:");
@@ -68,7 +67,19 @@ void* stdin_cb_fn(void *arg)
             break;
                 
             case '2':
-                break;
+            {
+                //turn on printing the counts.
+                webclient::one_second_timer_factory::Instance()->print_stats=1;
+            }
+            break;
+            
+            case '3':
+            {
+                //turn off printing the counts.
+                webclient::one_second_timer_factory::Instance()->print_stats=0;
+            }
+            break;
+            
             
             default:
                 printf("\ninvalid input_command[0]=%c\n",input_command[0]);

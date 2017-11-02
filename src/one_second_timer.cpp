@@ -13,7 +13,7 @@
 
 #include "one_second_timer.h"
 
-extern uint8_t is_webclient_alive();
+//extern uint8_t is_webclient_alive();
 
 webclient::one_second_timer_factory* webclient::one_second_timer_factory::p_one_second_timer_factory = NULL;
 
@@ -30,25 +30,37 @@ void* webclient::one_second_timer_factory::one_sec_timer(void *args)
 {
     pthread_setname_np(pthread_self(),
         "ONE_SEC_TIMER_THREAD");
+    
+    webclient::one_second_timer_factory::Instance()->print_stats=0;
    
     std::map<std::string,call_back_fn_ptr>::iterator iterator;
     
-    while(is_webclient_alive())
+    sleep(5);
+    
+    while(webclient::is_webclient_alive())
     {
-
         for (iterator = webclient::one_second_timer_factory::Instance()->timer_map.begin(); 
              iterator != webclient::one_second_timer_factory::Instance()->timer_map.end(); 
              ++iterator)
         {
             std::string name = iterator->first;
             call_back_fn_ptr fn_ptr=iterator->second;
-             
-            long return_value=(*fn_ptr)((void *)&name);
-             
-            printf("Invoking %s callback returned %ld\n",
-                    name.c_str(),return_value);
+            
+            if(fn_ptr)
+            {
+                long return_value=(*fn_ptr)((void *)&name);
+            
+                if(webclient::one_second_timer_factory::Instance()->print_stats)
+                {
+                    printf("Invoking %s callback returned %ld\n",
+                        name.c_str(),return_value);
+                }
+            }
+            else
+            {
+                VLOG_ERROR("fn_ptr is NULL for %s.\n",name.c_str());
+            }
         }
-
         sleep(1);
     }
    
@@ -93,6 +105,7 @@ void webclient::one_second_timer_factory::register_for_one_second_timer(std::str
         VLOG_ERROR("%s:%d  Input parameters are invalid.\n",__FUNCTION__,__LINE__);
         return;
     }
+    VLOG_ERROR("Registering callback fn for name=%s.\n",name.c_str());
     timer_map[name]=fn_pointer;
     
 }
