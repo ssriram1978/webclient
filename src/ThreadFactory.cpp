@@ -104,7 +104,7 @@ void *webclient::Thread_Factory::thread_main_job(void *arg)
        
        if(p_thread_var)
        {
-           p_thread_var->current_job_count[thread_id]+=1;
+           //p_thread_var->current_job_count[thread_id]+=1;
        }
    }
    
@@ -172,7 +172,7 @@ void webclient::Thread_Factory::Create_Thread(uint8_t index)
     }
     
     pthread_var->thread_array_var.push_back(pthread_ptr);
-    pthread_var->current_job_count.push_back(running_count);
+    //pthread_var->current_job_count.push_back(running_count);
     pthread_var->total_number_of_pthreads++;
     
     VLOG_ERROR("%s:%d For state(%d),Incrementing total number of pthreads to %d\n",
