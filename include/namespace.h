@@ -4,14 +4,15 @@
  * and open the template in the editor.
  */
 
-/* 
+/*
  * File:   namespace.h
  * Author: ssridhar
- * 
+ *
  * Created on October 11, 2017, 1:06 PM
  */
 #ifndef NAMESPACE_H
 #define NAMESPACE_H
+
 #define _XOPEN_SOURCE 700
 #define _BSD_SOURCE
 #include <iostream>
@@ -42,15 +43,15 @@
 
 namespace webclient {
 
-using namespace std;
+    using namespace std;
 
-typedef unsigned char uint8_t;
-typedef unsigned int uint32_t;
-typedef unsigned long uint64_t;
+    typedef unsigned char uint8_t;
+    typedef unsigned int uint32_t;
+    typedef unsigned long uint64_t;
 
 #define SUCCESS 1
 #define FAILURE 2
-extern int is_webclient_alive();
+    extern int is_webclient_alive();
 
 }
 

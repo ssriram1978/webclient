@@ -4,10 +4,10 @@
  * and open the template in the editor.
  */
 
-/* 
+/*
  * File:   QueueFactory.h
  * Author: ssridhar
- * 
+ *
  * Created on October 11, 2017, 1:06 PM
  */
 #ifndef QUEUE_FACTORY_H
@@ -16,46 +16,45 @@
 #include "namespace.h"
 
 namespace webclient {
-class Queue_Factory {
-  private:
- 
-  typedef struct _msgq_node
-  {
-     void *pData;
-     uint32_t message_length;
-     struct _msgq_node *pLink;
-  } msgq_node;
-  
-  typedef struct _msgQ
-  {
-     msgq_node *pFront;
-     msgq_node *pRear;
-     long count;
-  } msgQ;
- 
-  msgQ *p_g_msgQ;
-  uint8_t total_number_of_queues;
 
-  static Queue_Factory* m_pInstance;
+    class Queue_Factory {
+    private:
 
-  Queue_Factory() {
-     p_g_msgQ = NULL;     
-  }
-  
-public:
-   long count(uint8_t queue_type);
-   ~Queue_Factory();
-   uint8_t enqueue(uint8_t queue_type,void * message,uint32_t message_size);
-   void dequeue(uint8_t queue_type,void **ppMessage, uint32_t *pMessageLength);
-   uint8_t is_empty(uint8_t queue_type);
-   void set_total_number_of_queues(uint8_t queue_total);
-   void peek_at_the_front_of_queue(uint8_t queue_type, 
-   void **ppMessage, 
-   uint32_t *pMessageLength,
-   long location);
-   static Queue_Factory* Instance();
-   static long return_current_queue_count(void *arg);
-};
+        typedef struct _msgq_node {
+            void *pData;
+            uint32_t message_length;
+            struct _msgq_node *pLink;
+        } msgq_node;
+
+        typedef struct _msgQ {
+            msgq_node *pFront;
+            msgq_node *pRear;
+            long count;
+        } msgQ;
+
+        msgQ *p_g_msgQ;
+        uint8_t total_number_of_queues;
+
+        static Queue_Factory* m_pInstance;
+
+        Queue_Factory() {
+            p_g_msgQ = NULL;
+        }
+
+    public:
+        long count(uint8_t queue_type);
+        ~Queue_Factory();
+        uint8_t enqueue(uint8_t queue_type, void * message, uint32_t message_size);
+        void dequeue(uint8_t queue_type, void **ppMessage, uint32_t *pMessageLength);
+        uint8_t is_empty(uint8_t queue_type);
+        void set_total_number_of_queues(uint8_t queue_total);
+        void peek_at_the_front_of_queue(uint8_t queue_type,
+                void **ppMessage,
+                uint32_t *pMessageLength,
+                long location);
+        static Queue_Factory* Instance();
+        static long return_current_queue_count(void *arg);
+    };
 }
 
 #endif

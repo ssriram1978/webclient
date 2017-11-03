@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-/* 
+/*
  * File:   WebClient.h
  * Author: ssridhar
  *
@@ -15,6 +15,7 @@
 #define WEBCLIENT_H
 
 namespace webclient {
+
     class WebClientFactory {
     private:
         WebClientFactory();

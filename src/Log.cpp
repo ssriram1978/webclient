@@ -4,10 +4,10 @@
  * and open the template in the editor.
  */
 
-/* 
+/*
  * File:   Log.cpp
  * Author: ssridhar
- * 
+ *
  * Created on October 11, 2017, 1:06 PM
  */
 
@@ -16,12 +16,13 @@
 
 using namespace std;
 
-static char  gProcessName[PROCESS_NAME_LEN] = "WEBCLIENT";
-static char  gPid[PROCESS_ID_LEN]           = "0";
+static char gProcessName[PROCESS_NAME_LEN] = "WEBCLIENT";
+static char gPid[PROCESS_ID_LEN] = "0";
 
 static map<string, LogLevel> loglevels;
 
 #if 0
+
 static char* threadId() {
     static __thread char thread_id_buf[25];
     static __thread bool firsttime = false;
@@ -35,13 +36,17 @@ static char* threadId() {
 }
 #endif
 
+/**
+ * threadName It returns the current thread name.
+ * @return  char*
+ */
 static char* threadName() {
     static __thread char thread_name_buf[35];
     static __thread bool firsttime = false;
 
     if (false == firsttime) {
         char thread_name[25];
-        pthread_getname_np(pthread_self(), thread_name, sizeof(thread_name));
+        pthread_getname_np(pthread_self(), thread_name, sizeof (thread_name));
         snprintf(thread_name_buf, sizeof (thread_name_buf), "[%s]", thread_name);
         firsttime = true;
     }
@@ -49,22 +54,31 @@ static char* threadName() {
     return thread_name_buf;
 }
 
+/**
+ * timestamp It prints the current timestamp.
+ * @param ts_buf
+ * @param size
+ * @return
+ */
 char* timestamp(char* ts_buf, size_t size) {
-  char tmp[6];
+    char tmp[6];
 
-  ::timeb raw;
-  ::tm time_info;
+    ::timeb raw;
+    ::tm time_info;
 
-  ::ftime(&raw);
-  ::localtime_r(&raw.time, &time_info);
-  //size_t size_ts = ::strftime(ts_buf, size, "[%a %b %d %T.",&time_info);
-  size_t size_tmp = std::snprintf(tmp, sizeof (tmp), "%03d]", raw.millitm);
-  strncat(ts_buf, tmp, size_tmp);
-  return ts_buf;
+    ::ftime(&raw);
+    ::localtime_r(&raw.time, &time_info);
+    //size_t size_ts = ::strftime(ts_buf, size, "[%a %b %d %T.",&time_info);
+    size_t size_tmp = std::snprintf(tmp, sizeof (tmp), "%03d]", raw.millitm);
+    strncat(ts_buf, tmp, size_tmp);
+    return ts_buf;
 }
 
-void initializeLogParameters(const char *pname) 
-{
+/**
+ * initializeLogParameters It initializes the log parameters.
+ * @param pname
+ */
+void initializeLogParameters(const char *pname) {
     string processname(pname);
     auto pos = processname.rfind('/');
     if (pos != string::npos) {
@@ -90,25 +104,36 @@ void initializeLogParameters(const char *pname)
     loglevels[string("VERBOSE")] = LOGLEVEL_VERBOSE;
 }
 
-void setLogLevel(const char* level)
-{
+/**
+ * setLogLevel It sets the loglevel based upon the input.
+ * @param level
+ */
+void setLogLevel(const char* level) {
     auto it = loglevels.find(level);
     if (it != loglevels.end()) {
         gCommonLogLevel = loglevels[level];
         printf("Log level set to: [%s : %d]", level, gCommonLogLevel);
     } else {
-        VLOG_ERROR("Failed to set log level to %s", level);
+        LOG_ERROR("Failed to set log level to %s", level);
     }
 }
 
-void logText(const char* level, const char* message)
-{
+/**
+ * logText It logs the text message.
+ * @param level
+ * @param message
+ */
+void logText(const char* level, const char* message) {
     char ts_buf[26 * 3] = {0};
-    std::cout << gProcessName << gPid << threadName() << timestamp(ts_buf, sizeof(ts_buf)) << level << message << std::endl;
+    std::cout << gProcessName << gPid << threadName() << timestamp(ts_buf, sizeof (ts_buf)) << level << message << std::endl;
 }
 
-void logErrorText(const char* level, const char* message)
-{
+/**
+ * logErrorText It logs the error log message.
+ * @param level
+ * @param message
+ */
+void logErrorText(const char* level, const char* message) {
     char ts_buf[26 * 3] = {0};
-    std::cerr << gProcessName << gPid << threadName() << timestamp(ts_buf, sizeof(ts_buf)) << level << message << std::endl;
+    std::cerr << gProcessName << gPid << threadName() << timestamp(ts_buf, sizeof (ts_buf)) << level << message << std::endl;
 }

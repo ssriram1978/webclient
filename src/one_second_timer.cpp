@@ -4,10 +4,10 @@
  * and open the template in the editor.
  */
 
-/* 
+/*
  * File:   one_second_timer.cpp
  * Author: ssridhar
- * 
+ *
  * Created on October 31, 2017, 1:06 PM
  */
 
@@ -17,97 +17,103 @@
 
 webclient::one_second_timer_factory* webclient::one_second_timer_factory::p_one_second_timer_factory = NULL;
 
-webclient::one_second_timer_factory *webclient::one_second_timer_factory::Instance()
-{
-    if (!webclient::one_second_timer_factory::p_one_second_timer_factory)
-    {
-        webclient::one_second_timer_factory::p_one_second_timer_factory=new webclient::one_second_timer_factory();
+/**
+ *Instance Provides the one second timer factory instance.
+ * @return
+ */
+webclient::one_second_timer_factory *webclient::one_second_timer_factory::Instance() {
+    if (!webclient::one_second_timer_factory::p_one_second_timer_factory) {
+        webclient::one_second_timer_factory::p_one_second_timer_factory = new webclient::one_second_timer_factory();
     }
     return webclient::one_second_timer_factory::p_one_second_timer_factory;
 }
 
-void* webclient::one_second_timer_factory::one_sec_timer(void *args)
-{
+/**
+ *one_sec_timer This is the main thread processing callback.
+ * In this fn, it iterates over the map containing the mapping of module name and
+ * the corresponding call back function and invokes them one by one.
+ * @param args
+ * @return
+ */
+void* webclient::one_second_timer_factory::one_sec_timer(void *args) {
     pthread_setname_np(pthread_self(),
-        "ONE_SEC_TIMER_THREAD");
-    
-    webclient::one_second_timer_factory::Instance()->print_stats=0;
-   
-    std::map<std::string,call_back_fn_ptr>::iterator iterator;
-    
+            "ONE_SEC_TIMER_THREAD");
+
+    webclient::one_second_timer_factory::Instance()->print_stats = 0;
+
+    std::map<std::string, call_back_fn_ptr>::iterator iterator;
+
     sleep(5);
-    
-    while(webclient::is_webclient_alive())
-    {
-        for (iterator = webclient::one_second_timer_factory::Instance()->timer_map.begin(); 
-             iterator != webclient::one_second_timer_factory::Instance()->timer_map.end(); 
-             ++iterator)
-        {
+
+    while (webclient::is_webclient_alive()) {
+        for (iterator = webclient::one_second_timer_factory::Instance()->timer_map.begin();
+                iterator != webclient::one_second_timer_factory::Instance()->timer_map.end();
+                ++iterator) {
             std::string name = iterator->first;
-            call_back_fn_ptr fn_ptr=iterator->second;
-            
-            if(fn_ptr)
-            {
-                long return_value=(*fn_ptr)((void *)&name);
-            
-                if(webclient::one_second_timer_factory::Instance()->print_stats)
-                {
+            call_back_fn_ptr fn_ptr = iterator->second;
+
+            if (fn_ptr) {
+                long return_value = (*fn_ptr)((void *) &name);
+
+                if (webclient::one_second_timer_factory::Instance()->print_stats) {
                     printf("Invoking %s callback returned %ld\n",
-                        name.c_str(),return_value);
+                            name.c_str(), return_value);
                 }
-            }
-            else
-            {
-                VLOG_ERROR("fn_ptr is NULL for %s.\n",name.c_str());
+            } else {
+                LOG_ERROR("fn_ptr is NULL for %s.\n", name.c_str());
             }
         }
         sleep(1);
     }
-   
-    VLOG_DEBUG("ONE_SEC_TIMER_THREAD thread exiting");
-   
-   return NULL;
+
+    LOG_DEBUG("ONE_SEC_TIMER_THREAD thread exiting");
+
+    return NULL;
 }
 
-webclient::one_second_timer_factory::one_second_timer_factory()
-{
-    timer_map={};
+/**
+ *one_second_timer_factory Constructor. It spawns the one second timer pthread.
+ */
+webclient::one_second_timer_factory::one_second_timer_factory() {
+    timer_map = {};
     //start a one second timer thread.
     pthread_attr_t attr;
     pthread_t pthread_ptr;
     pthread_attr_init(&attr);
     pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
-    
+
 
     pthread_create(
-        &pthread_ptr,
-        &attr,
-        &webclient::one_second_timer_factory::one_sec_timer,
-        NULL);
+            &pthread_ptr,
+            &attr,
+            &webclient::one_second_timer_factory::one_sec_timer,
+            NULL);
 
 }
 
-webclient::one_second_timer_factory::~one_second_timer_factory()
-{
-    
+/**
+ *~one_second_timer_factory Destructor.
+ */
+webclient::one_second_timer_factory::~one_second_timer_factory() {
+
 }
 
-long temp(void *args)
-{
-    return 1;
-}
-
+/**
+ *register_for_one_second_timer Whoever wants to register their call back functions
+ * to provide statistics to this one second timer may use this function to register
+ * their name of the variable and the corresponding call back function.
+ * @param name
+ * @param fn_pointer
+ */
 void webclient::one_second_timer_factory::register_for_one_second_timer(std::string name,
-        long (*fn_pointer)(void*))
-{
-    if(name.empty() || (fn_pointer == NULL))
-    {
-        VLOG_ERROR("%s:%d  Input parameters are invalid.\n",__FUNCTION__,__LINE__);
+        long (*fn_pointer)(void*)) {
+    if (name.empty() || (fn_pointer == NULL)) {
+        LOG_ERROR("%s:%d  Input parameters are invalid.\n", __FUNCTION__, __LINE__);
         return;
     }
-    VLOG_ERROR("Registering callback fn for name=%s.\n",name.c_str());
-    timer_map[name]=fn_pointer;
-    
+    LOG_ERROR("Registering callback fn for name=%s.\n", name.c_str());
+    timer_map[name] = fn_pointer;
+
 }
 
 

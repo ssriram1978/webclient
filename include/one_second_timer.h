@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-/* 
+/*
  * File:   one_second_timer.h
  * Author: ssridhar
  *
@@ -15,24 +15,25 @@
 #define ONE_SECOND_TIMER_H
 #include "namespace.h"
 
-namespace webclient {   
-class one_second_timer_factory {
-private:
-    one_second_timer_factory();
-    typedef long (*call_back_fn_ptr)(void*);
-    typedef std::map<std::string,call_back_fn_ptr> one_sec_timer_map;
-    one_sec_timer_map timer_map;
-    static one_second_timer_factory *p_one_second_timer_factory;
-    
-public:
-    static one_second_timer_factory *Instance();
-    static void* one_sec_timer(void *args);
-    void one_second_timer_Factory();
-    virtual ~one_second_timer_factory();
-    void register_for_one_second_timer(std::string name,
-        long (*fn_pointer)(void*));
-    uint8_t print_stats;
-    
-};
+namespace webclient {
+
+    class one_second_timer_factory {
+    private:
+        one_second_timer_factory();
+        typedef long (*call_back_fn_ptr)(void*);
+        typedef std::map<std::string, call_back_fn_ptr> one_sec_timer_map;
+        one_sec_timer_map timer_map;
+        static one_second_timer_factory *p_one_second_timer_factory;
+
+    public:
+        static one_second_timer_factory *Instance();
+        static void* one_sec_timer(void *args);
+        void one_second_timer_Factory();
+        virtual ~one_second_timer_factory();
+        void register_for_one_second_timer(std::string name,
+                long (*fn_pointer)(void*));
+        uint8_t print_stats;
+
+    };
 }
 #endif /* ONE_SECOND_TIMER_H */

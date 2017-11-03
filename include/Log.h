@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-/* 
+/*
  * File:   Log.h
  * Author: ssridhar
  *
@@ -26,18 +26,18 @@
 #define XSTR(x) STR(x)
 
 typedef enum {
-   LOGLEVEL_EMERGENCY = 0,
-   LOGLEVEL_INIT,
-   LOGLEVEL_ALERT,
-   LOGLEVEL_CRITICAL,
-   LOGLEVEL_ERROR,
-   LOGLEVEL_WARN,
-   LOGLEVEL_NOTICE,
-   LOGLEVEL_INFO,
-   LOGLEVEL_DEBUG,
-   LOGLEVEL_TRACE,
-   LOGLEVEL_VERBOSE
-}LogLevel;
+    LOGLEVEL_EMERGENCY = 0,
+    LOGLEVEL_INIT,
+    LOGLEVEL_ALERT,
+    LOGLEVEL_CRITICAL,
+    LOGLEVEL_ERROR,
+    LOGLEVEL_WARN,
+    LOGLEVEL_NOTICE,
+    LOGLEVEL_INFO,
+    LOGLEVEL_DEBUG,
+    LOGLEVEL_TRACE,
+    LOGLEVEL_VERBOSE
+} LogLevel;
 
 static LogLevel gCommonLogLevel = LOGLEVEL_ERROR;
 
@@ -47,7 +47,7 @@ static LogLevel gCommonLogLevel = LOGLEVEL_ERROR;
 void logText(const char* level, const char* message);
 void logErrorText(const char* level, const char* message);
 
-#define __VLOG_CREATE_MESSAGE(...)                                        \
+#define __LOG_CREATE_MESSAGE(...)                                        \
   char __message[BUFSIZ+1];                    \
   int __lglen = snprintf(__message, BUFSIZ, "[" __FILE__ ":" XSTR(__LINE__) "] "  \
       __VA_ARGS__);                                                        \
@@ -57,91 +57,91 @@ void logErrorText(const char* level, const char* message);
       __lglen = BUFSIZ-1;                                                 \
   }
 
-#define VLOG_EMERG(...)                          \
+#define LOG_EMERG(...)                          \
   do {                                           \
     if (LOGLEVEL_EMERGENCY > gCommonLogLevel)    \
       break;                                     \
-    __VLOG_CREATE_MESSAGE(__VA_ARGS__);          \
+    __LOG_CREATE_MESSAGE(__VA_ARGS__);          \
     logErrorText("[EMERG]", __message);          \
   } while(0)
 
-#define VLOG_INIT(...)                           \
+#define LOG_INIT(...)                           \
   do {                                           \
     if (LOGLEVEL_INIT > gCommonLogLevel)         \
       break;                                     \
-    __VLOG_CREATE_MESSAGE(__VA_ARGS__);          \
+    __LOG_CREATE_MESSAGE(__VA_ARGS__);          \
     logText("[INIT]", __message);                \
   } while(0)
 
-#define VLOG_ALERT(...)                          \
+#define LOG_ALERT(...)                          \
   do {                                           \
     if (LOGLEVEL_ALERT > gCommonLogLevel)        \
       break;                                     \
-    __VLOG_CREATE_MESSAGE(__VA_ARGS__);          \
+    __LOG_CREATE_MESSAGE(__VA_ARGS__);          \
     logErrorText("[ALERT]", __message);          \
   } while(0)
 
-#define VLOG_CRITICAL(...)                       \
+#define LOG_CRITICAL(...)                       \
   do {                                           \
     if (LOGLEVEL_CRITICAL > gCommonLogLevel)     \
       break;                                     \
-    __VLOG_CREATE_MESSAGE(__VA_ARGS__);          \
+    __LOG_CREATE_MESSAGE(__VA_ARGS__);          \
     logErrorText("[CRITICAL]", __message);       \
   } while(0)
 
-#define VLOG_ERROR(...)                          \
+#define LOG_ERROR(...)                          \
   do {                                           \
     if (LOGLEVEL_ERROR > gCommonLogLevel)        \
       break;                                     \
-    __VLOG_CREATE_MESSAGE(__VA_ARGS__);          \
+    __LOG_CREATE_MESSAGE(__VA_ARGS__);          \
     logErrorText("[ERROR]", __message);          \
   } while(0)
 
-#define VLOG_WARN(...)                           \
+#define LOG_WARN(...)                           \
   do {                                           \
     if (LOGLEVEL_WARN > gCommonLogLevel)         \
       break;                                     \
-    __VLOG_CREATE_MESSAGE(__VA_ARGS__);          \
+    __LOG_CREATE_MESSAGE(__VA_ARGS__);          \
     logErrorText("[WARN]", __message);           \
   } while(0)
 
-#define VLOG_NOTICE(...)                         \
+#define LOG_NOTICE(...)                         \
   do {                                           \
     if (LOGLEVEL_NOTICE > gCommonLogLevel)       \
       break;                                     \
-    __VLOG_CREATE_MESSAGE(__VA_ARGS__);          \
+    __LOG_CREATE_MESSAGE(__VA_ARGS__);          \
     logText("[NOTICE]", __message);              \
   } while(0)
 
-#define VLOG_INFO(...)                           \
+#define LOG_INFO(...)                           \
   do {                                           \
     if (LOGLEVEL_INFO > gCommonLogLevel)         \
       break;                                     \
-    __VLOG_CREATE_MESSAGE(__VA_ARGS__);          \
+    __LOG_CREATE_MESSAGE(__VA_ARGS__);          \
     logText("[INFO]", __message);                \
   } while(0)
 
-#define VLOG_DEBUG(...)                          \
+#define LOG_DEBUG(...)                          \
   do {                                           \
     if (LOGLEVEL_DEBUG > gCommonLogLevel)        \
       break;                                     \
-    __VLOG_CREATE_MESSAGE(__VA_ARGS__);          \
+    __LOG_CREATE_MESSAGE(__VA_ARGS__);          \
     logText("[DEBUG]", __message);               \
   } while(0)
 
-#define VLOG_TRACE(...)                          \
+#define LOG_TRACE(...)                          \
   do {                                           \
     if (LOGLEVEL_TRACE > gCommonLogLevel)        \
       break;                                     \
-    __VLOG_CREATE_MESSAGE(__VA_ARGS__);          \
+    __LOG_CREATE_MESSAGE(__VA_ARGS__);          \
     logText("[TRACE]", __message);               \
   } while(0)
 
-#define VLOG_VERBOSE(...)                        \
+#define LOG_VERBOSE(...)                        \
   do {                                           \
     if (LOGLEVEL_VERBOSE > gCommonLogLevel)      \
       break;                                     \
-    __VLOG_CREATE_MESSAGE(__VA_ARGS__);          \
+    __LOG_CREATE_MESSAGE(__VA_ARGS__);          \
     logText("[VERBOSE]", __message);             \
   } while(0)
 
