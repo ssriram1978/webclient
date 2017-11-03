@@ -28,5 +28,9 @@ Just do make in the webclient directory.
 
 Run:
 ./WEBCLIENT --help
-options: [-d <dbglvl 0-DEBUG,1-INFO,2-NOTICE,3-ERROR>] [-s <starting port>] [-e <ending port>] [-l <local ipaddr>] [-r <remote ip or domain name>]
+options: [-d <dbglvl 0-DEBUG,1-INFO,2-NOTICE,3-ERROR>]
+         [-s <starting port>]
+         [-e <ending port>]
+         [-l <local ipaddr>]
+         [-r <remote ip or domain name>]
 
