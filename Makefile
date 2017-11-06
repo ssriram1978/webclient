@@ -3,18 +3,19 @@ GPP = g++
 top_srcdir = /home/ssridhar/git/webclient
 
 
-# -Wno-deprecatd-declarations is for 
+# -Wno-deprecatd-declarations is for
 CFLAGS+= -g -Wall -Wformat-nonliteral -Wformat-security \
          -Wno-deprecated-declarations \
          -Iinclude \
 	 #-DSINGLE_ROW_SET \
 
-CPPFLAGS+= -std=c++11 
+CPPFLAGS+= -std=c++11 \
+	   -Wformat-nonliteral \
 
 LDFLAGS +=    -lpthread \
 	      -lz \
 	      #-Wl \
-	      
+
 
 web_client_c_sources = \
 
@@ -31,7 +32,7 @@ web_client_cpp_sources = \
 	src/stdin_cb.cpp \
 	src/one_second_timer.cpp \
 	src/WebClient.cpp
-        
+
 
 web_client_c_objects=$(web_client_c_sources:%.c=%.o)
 
@@ -54,7 +55,7 @@ WEBCLIENT: $(web_client_objects)
 	$(GPP) $(CFLAGS) $(CPPFLAGS) -fPIC -c $< -o $@
 
 install:
-	#cp WEBCLIENT 
+	#cp WEBCLIENT
 
 clean:
 	rm -f $(APPS)

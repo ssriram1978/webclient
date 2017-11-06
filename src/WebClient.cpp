@@ -187,7 +187,6 @@ int webclient::WebClientFactory::socket_writer(void *p_job_details) {
     Job *p_job = (Job *) p_job_details;
     ssize_t nbytes_total, nbytes_last;
     char request[MAX_REQUEST_LEN];
-    char request_template[] = "GET / HTTP/1.1\r\nHost: %s\r\n\r\n";
     int request_len = 0;
 
     if (!p_job) {
@@ -207,10 +206,15 @@ int webclient::WebClientFactory::socket_writer(void *p_job_details) {
     memset(request, 0, MAX_REQUEST_LEN);
 
     if (strlen(p_job->remote_domain_name) < MAX_REQUEST_LEN) {
+#if 0
         request_len = snprintf(static_cast<char *> (request),
                 static_cast<size_t> (MAX_REQUEST_LEN),
                 static_cast<const char *> (request_template),
                 static_cast<char *> (p_job->remote_domain_name));
+#endif
+        request_len = sprintf(request,
+                "GET / HTTP/1.1\r\nHost: %s\r\n\r\n",
+                p_job->remote_domain_name);
     }
 
     if (request_len >= MAX_REQUEST_LEN) {
