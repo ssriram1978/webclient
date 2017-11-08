@@ -13,9 +13,9 @@
 #ifndef THREAD_FACTORY_H
 #define THREAD_FACTORY_H
 
-#include "namespace.h"
+#include "pipeline_framework.h"
 
-namespace webclient {
+namespace pipeline_framework {
 
     class Thread_Factory {
     private:

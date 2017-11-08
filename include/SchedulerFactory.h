@@ -14,10 +14,9 @@
 #ifndef SCHEDULER_FACTORY_H
 #define SCHEDULER_FACTORY_H
 
-#include "namespace.h"
-#include "Job.h"
+#include "pipeline_framework.h"
 
-namespace webclient {
+namespace pipeline_framework {
 
     class Scheduler_Factory {
     private:
@@ -31,18 +30,13 @@ namespace webclient {
     public:
         ~Scheduler_Factory();
         static Scheduler_Factory* Instance();
-        void initialize(
-                uint16_t starting_port,
-                uint16_t ending_port,
-                uint32_t local_ipv4_address,
-                uint32_t remote_ipv4_address,
-                char remote_address[]);
+        void initialize(int argc, char **argv);
         void run();
         void stop();
         static void Perform_a_Job(uint8_t state_id);
         static void* Dequeue_Job(void *p_state);
-        static int Execute_Job(webclient::Job *p_job);
-        static void Move_Job(webclient::Job *p_job);
+        static int Execute_Job(uint64_t job_id);
+        static void Move_Job(uint64_t job_id);
         static long return_current_dequeue_done_count(void *arg);
         static long return_current_enqueue_done_count(void *arg);
     };

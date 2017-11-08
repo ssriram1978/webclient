@@ -15,7 +15,7 @@
 #ifndef STDIN_CB_H
 #define STDIN_CB_H
 
-#include "namespace.h"
+#include "pipeline_framework.h"
 
 void* stdin_cb_fn(void *arg);
 

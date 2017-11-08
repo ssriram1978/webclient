@@ -20,7 +20,7 @@
 //extern "C" {
 //#endif
 
-#include "namespace.h"
+#include "pipeline_framework.h"
 
 #define STR(x) #x
 #define XSTR(x) STR(x)

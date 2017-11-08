@@ -13,9 +13,9 @@
 
 #ifndef ONE_SECOND_TIMER_H
 #define ONE_SECOND_TIMER_H
-#include "namespace.h"
+#include "pipeline_framework.h"
 
-namespace webclient {
+namespace pipeline_framework {
 
     class one_second_timer_factory {
     private:

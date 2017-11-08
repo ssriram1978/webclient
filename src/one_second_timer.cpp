@@ -15,17 +15,17 @@
 
 //extern uint8_t is_webclient_alive();
 
-webclient::one_second_timer_factory* webclient::one_second_timer_factory::p_one_second_timer_factory = NULL;
+pipeline_framework::one_second_timer_factory* pipeline_framework::one_second_timer_factory::p_one_second_timer_factory = NULL;
 
 /**
  *Instance Provides the one second timer factory instance.
  * @return
  */
-webclient::one_second_timer_factory *webclient::one_second_timer_factory::Instance() {
-    if (!webclient::one_second_timer_factory::p_one_second_timer_factory) {
-        webclient::one_second_timer_factory::p_one_second_timer_factory = new webclient::one_second_timer_factory();
+pipeline_framework::one_second_timer_factory *pipeline_framework::one_second_timer_factory::Instance() {
+    if (!pipeline_framework::one_second_timer_factory::p_one_second_timer_factory) {
+        pipeline_framework::one_second_timer_factory::p_one_second_timer_factory = new pipeline_framework::one_second_timer_factory();
     }
-    return webclient::one_second_timer_factory::p_one_second_timer_factory;
+    return pipeline_framework::one_second_timer_factory::p_one_second_timer_factory;
 }
 
 /**
@@ -35,19 +35,19 @@ webclient::one_second_timer_factory *webclient::one_second_timer_factory::Instan
  * @param args
  * @return
  */
-void* webclient::one_second_timer_factory::one_sec_timer(void *args) {
+void* pipeline_framework::one_second_timer_factory::one_sec_timer(void *args) {
     pthread_setname_np(pthread_self(),
             "ONE_SEC_TIMER_THREAD");
 
-    webclient::one_second_timer_factory::Instance()->print_stats = 0;
+    pipeline_framework::one_second_timer_factory::Instance()->print_stats = 0;
 
     std::map<std::string, call_back_fn_ptr>::iterator iterator;
 
     sleep(5);
 
-    while (webclient::is_webclient_alive()) {
-        for (iterator = webclient::one_second_timer_factory::Instance()->timer_map.begin();
-                iterator != webclient::one_second_timer_factory::Instance()->timer_map.end();
+    while (pipeline_framework::is_webclient_alive()) {
+        for (iterator = pipeline_framework::one_second_timer_factory::Instance()->timer_map.begin();
+                iterator != pipeline_framework::one_second_timer_factory::Instance()->timer_map.end();
                 ++iterator) {
             std::string name = iterator->first;
             call_back_fn_ptr fn_ptr = iterator->second;
@@ -55,7 +55,7 @@ void* webclient::one_second_timer_factory::one_sec_timer(void *args) {
             if (fn_ptr) {
                 long return_value = (*fn_ptr)((void *) &name);
 
-                if (webclient::one_second_timer_factory::Instance()->print_stats) {
+                if (pipeline_framework::one_second_timer_factory::Instance()->print_stats) {
                     printf("Invoking %s callback returned %ld\n",
                             name.c_str(), return_value);
                 }
@@ -74,7 +74,7 @@ void* webclient::one_second_timer_factory::one_sec_timer(void *args) {
 /**
  *one_second_timer_factory Constructor. It spawns the one second timer pthread.
  */
-webclient::one_second_timer_factory::one_second_timer_factory() {
+pipeline_framework::one_second_timer_factory::one_second_timer_factory() {
     timer_map = {};
     //start a one second timer thread.
     pthread_attr_t attr;
@@ -86,7 +86,7 @@ webclient::one_second_timer_factory::one_second_timer_factory() {
     pthread_create(
             &pthread_ptr,
             &attr,
-            &webclient::one_second_timer_factory::one_sec_timer,
+            &pipeline_framework::one_second_timer_factory::one_sec_timer,
             NULL);
 
 }
@@ -94,7 +94,7 @@ webclient::one_second_timer_factory::one_second_timer_factory() {
 /**
  *~one_second_timer_factory Destructor.
  */
-webclient::one_second_timer_factory::~one_second_timer_factory() {
+pipeline_framework::one_second_timer_factory::~one_second_timer_factory() {
 
 }
 
@@ -105,7 +105,7 @@ webclient::one_second_timer_factory::~one_second_timer_factory() {
  * @param name
  * @param fn_pointer
  */
-void webclient::one_second_timer_factory::register_for_one_second_timer(std::string name,
+void pipeline_framework::one_second_timer_factory::register_for_one_second_timer(std::string name,
         long (*fn_pointer)(void*)) {
     if (name.empty() || (fn_pointer == NULL)) {
         LOG_ERROR("%s:%d  Input parameters are invalid.\n", __FUNCTION__, __LINE__);

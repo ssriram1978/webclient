@@ -7,10 +7,12 @@ top_srcdir = /home/ssridhar/git/webclient
 CFLAGS+= -g -Wall -Wformat-nonliteral -Wformat-security \
          -Wno-deprecated-declarations \
          -Iinclude \
+	 -DWEB_CLIENT \
 	 #-DSINGLE_ROW_SET \
 
 CPPFLAGS+= -std=c++11 \
 	   -Wformat-nonliteral \
+	   -DWEB_CLIENT \
 
 LDFLAGS +=    -lpthread \
 	      -lz \
@@ -22,8 +24,6 @@ web_client_c_sources = \
 web_client_cpp_sources = \
 	src/Log.cpp \
         src/QueueFactory.cpp \
-        src/StateFactory.cpp \
-        src/Job.cpp \
         src/JobFactory.cpp \
         src/MutexFactory.cpp \
         src/SchedulerFactory.cpp \
@@ -31,7 +31,7 @@ web_client_cpp_sources = \
         src/web_client_main.cpp \
 	src/stdin_cb.cpp \
 	src/one_second_timer.cpp \
-	src/WebClient.cpp
+	src/Executor.cpp
 
 
 web_client_c_objects=$(web_client_c_sources:%.c=%.o)

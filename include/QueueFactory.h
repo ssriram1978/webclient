@@ -13,9 +13,9 @@
 #ifndef QUEUE_FACTORY_H
 #define QUEUE_FACTORY_H
 
-#include "namespace.h"
+#include "pipeline_framework.h"
 
-namespace webclient {
+namespace pipeline_framework {
 
     class Queue_Factory {
     private:
