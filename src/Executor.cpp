@@ -24,6 +24,7 @@ pipeline_framework::Executor::Executor() {
     local_ip_address = LOCAL_IP;
     remote_ip_address = REMOTE_IP;
     memset(remote_address, 0, MAX_REMOTE_ADDRESS_LEN);
+    total_number_of_jobs = 0;
 }
 
 /**
@@ -125,10 +126,14 @@ void pipeline_framework::Executor::initialize(int argc, char **argv) {
 }
 
 void pipeline_framework::Executor::prepare_jobs() {
-    p_jobs = (Job *) calloc((local_ending_port - local_starting_port) + 1, sizeof (Job));
+    uint16_t total_number_of_ports = (local_ending_port - local_starting_port) + 1;
 
-    for (uint16_t count = local_starting_port;
-            count <= local_ending_port;
+    p_jobs = (Job *) calloc(total_number_of_ports, sizeof (Job));
+
+    LOG_DEBUG("total_number_of_ports=%d\n", total_number_of_ports);
+
+    for (uint16_t count = 0;
+            count < total_number_of_ports;
             count++) {
         (p_jobs + count)->local_port = local_starting_port + count;
         (p_jobs + count)->local_ipv4 = local_ip_address;
@@ -290,7 +295,7 @@ uint8_t pipeline_framework::Executor::get_next_state(uint8_t current_state) {
 }
 
 uint8_t pipeline_framework::Executor::get_max_state() {
-    return SOCKET_DESTROYER;
+    return SOCKET_STATE_MAX;
 }
 
 
@@ -362,6 +367,7 @@ std::string pipeline_framework::Executor::convert_state_to_name(uint8_t state_va
 
 void pipeline_framework::Executor::get_all_jobs(std::vector<uint64_t> &job_identifiers) {
     for (uint64_t count = 0; count < total_number_of_jobs; count++) {
+        //LOG_DEBUG("Pushing job id(%ld).\n", count);
         job_identifiers.push_back(count);
     }
 }
@@ -378,9 +384,41 @@ int pipeline_framework::Executor::process_job(uint64_t job_identifier) {
         return FAILURE;
     }
 
-    return pipeline_framework::Executor::state_action_var[job_identifier].action_function((void *) p_current_job);
+    print_job(job_identifier);
+
+    return pipeline_framework::Executor::state_action_var[p_current_job->current_state].action_function((void *) p_current_job);
 }
 
+void pipeline_framework::Executor::print_job(uint64_t job_identifier) {
+    if ((job_identifier < 0) || (job_identifier >= total_number_of_jobs)) {
+        LOG_ERROR("Invalid job id(%ld).\n", job_identifier);
+        return;
+    }
+    Job *p_current_job = (Job *) (p_jobs + job_identifier);
+
+    if (!p_current_job) {
+        LOG_ERROR("Job cannot be found with (%ld).\n", job_identifier);
+        return;
+    }
+    LOG_DEBUG("job_id=%ld,"
+            "current_state=%d"
+            "local_ipv4=0x%08x"
+            "local_port=%d"
+            "remote_domain_name=%s"
+            "remote_ipv4=0x%08x"
+            "socket_file_descriptor=%d"
+            "iteration_count=%ld"
+            "\n",
+            job_identifier,
+            p_current_job->current_state,
+            p_current_job->local_ipv4,
+            p_current_job->local_port,
+            p_current_job->remote_domain_name,
+            p_current_job->remote_ipv4,
+            p_current_job->socket_file_descriptor,
+            p_current_job->iteration_count);
+
+}
 
 #define PROTO_ENT_VAL 6
 
@@ -598,6 +636,7 @@ int pipeline_framework::Executor::socket_reader(void *p_job_details) {
             BUFSIZ)) > 0) {
         //fprintf(stderr, "debug: after a read\n");
         //write(STDOUT_FILENO, buffer, nbytes_total);
+        LOG_DEBUG("Read Length=%ld %s \n", nbytes_total, buffer);
     }
     //fprintf(stderr, "debug: after last read\n");
 
@@ -634,5 +673,13 @@ int pipeline_framework::Executor::socket_destroyer(void *p_job_details) {
     }
 
     close(p_job->socket_file_descriptor);
+
+    LOG_DEBUG("Successfully closed socket towards remote ip=%s for fd=%d.\n",
+            p_job->remote_domain_name,
+            p_job->socket_file_descriptor);
+
+    p_job->socket_file_descriptor = 0;
+
+
     return SUCCESS;
 }

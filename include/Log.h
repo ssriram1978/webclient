@@ -39,7 +39,7 @@ typedef enum {
     LOGLEVEL_VERBOSE
 } LogLevel;
 
-static LogLevel gCommonLogLevel = LOGLEVEL_ERROR;
+static LogLevel gCommonLogLevel = LOGLEVEL_DEBUG;
 
 #define PROCESS_NAME_LEN     25
 #define PROCESS_ID_LEN       25
@@ -49,7 +49,7 @@ void logErrorText(const char* level, const char* message);
 
 #define __LOG_CREATE_MESSAGE(...)                                        \
   char __message[BUFSIZ+1];                    \
-  int __lglen = snprintf(__message, BUFSIZ, "[" __FILE__ ":" XSTR(__LINE__) "] "  \
+  int __lglen = snprintf(__message, BUFSIZ, "[" __FILE__  ":"  XSTR(__LINE__) "] "  \
       __VA_ARGS__);                                                        \
   if (__lglen >= BUFSIZ)                                                  \
   {                                                                       \

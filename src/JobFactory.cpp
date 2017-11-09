@@ -59,6 +59,10 @@ uint8_t pipeline_framework::Job_Factory::get_init_state() {
     return p_Executor->get_init_state();
 }
 
+uint8_t pipeline_framework::Job_Factory::get_next_state(uint8_t state) {
+    return p_Executor->get_next_state(state);
+}
+
 /**
  * create_Jobs This function creates jobs based upon the specified input parameters.
  * @param starting_port Starting local port on the local host where to bind.
@@ -80,29 +84,40 @@ void pipeline_framework::Job_Factory::Enqueue_All_Jobs_to_specified_queue(void *
     uint8_t queue_id = (uint8_t) thread_data;
 
     if (queue_id < p_Executor->get_init_state() ||
-            queue_id > p_Executor->get_init_state()) {
+            queue_id > p_Executor->get_max_state()) {
         LOG_ERROR("%s:%d  Input parameters are invalid.\n", __FUNCTION__, __LINE__);
         return;
     }
 
-    for (uint64_t index = 0; index < p_Executor->get_total_number_of_jobs(); index++) {
+    std::vector<uint64_t> job_identifiers;
 
-        std::vector<uint64_t> job_identifiers;
+    p_Executor->get_all_jobs(job_identifiers);
 
-        p_Executor->get_all_jobs(job_identifiers);
-
-        while (!job_identifiers.empty()) {
-            uint64_t job_id = job_identifiers.back();
-            if (job_id) {
-                LOG_DEBUG("\nqueue_id=%d,job_id=%ld\n", queue_id, job_id);
-                pipeline_framework::Queue_Factory::Instance()->enqueue(queue_id,
-                        (void *) job_id, sizeof (uint64_t));
-            }
-            job_identifiers.pop_back();
+    while (!job_identifiers.empty()) {
+        uint64_t job_id = job_identifiers.back();
+        if (job_id) {
+            LOG_DEBUG("\nqueue_id=%d,job_id=%ld\n", queue_id, job_id);
+            pipeline_framework::Queue_Factory::Instance()->enqueue(queue_id,
+                    (void *) job_id, sizeof (uint64_t));
         }
-
-
+        job_identifiers.pop_back();
     }
+}
+
+void pipeline_framework::Job_Factory::move_current_job_to_init_state(void *p_job_id) {
+    uint64_t job_id = (uint64_t) p_job_id;
+
+    if (job_id < 0) {
+        LOG_ERROR("%s:%d  Input parameters are invalid.\n", __FUNCTION__, __LINE__);
+        return;
+    }
+
+
+    LOG_DEBUG("\nmove job_id=%ld to init(%d) state.\n", job_id,
+            p_Executor->get_init_state());
+
+    pipeline_framework::Queue_Factory::Instance()->enqueue(p_Executor->get_init_state(),
+            (void *) job_id, sizeof (uint64_t));
 }
 
 /**
@@ -118,12 +133,14 @@ int pipeline_framework::Job_Factory::run_Job(uint64_t job_id) {
  * move_Job It changes the current state to the next state and enqueues the job to the next state.
  * @param p_job
  */
-void pipeline_framework::Job_Factory::move_Job(uint64_t job_id) {
+void pipeline_framework::Job_Factory::move_Job(void *p_job_id) {
 
-    if (!job_id) {
-        LOG_ERROR("Input parameter(job_id=%ld) is invalid.\n", job_id);
+    if (!p_job_id) {
+        LOG_ERROR("Input parameter(job_id=%p) is invalid.\n", p_job_id);
         return;
     }
+
+    uint64_t job_id = (uint64_t) p_job_id;
 
     uint8_t current_state = p_Executor->get_current_state(job_id);
     uint8_t next_state = p_Executor->get_next_state(current_state);

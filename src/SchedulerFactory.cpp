@@ -78,13 +78,15 @@ void pipeline_framework::Scheduler_Factory::initialize(int argc, char **argv) {
     pipeline_framework::Job_Factory::Instance()->create_Jobs(argc, argv);
 
     //Register for one second timer event callback.
-    for (int index = pipeline_framework::Job_Factory::get_init_state();
-            index < pipeline_framework::Job_Factory::get_total_number_of_states();
-            index++) {
+#if 0
+    uint8_t current_state = pipeline_framework::Job_Factory::get_init_state();
+    uint8_t final_state = pipeline_framework::Job_Factory::get_init_state();
+
+    while (current_state <= final_state) {
         long count = 0;
         std::string str_count(SCHEDULER_JOB);
         str_count.append("dequeue_count-");
-        str_count.append(pipeline_framework::Job_Factory::convert_state_to_name(index));
+        str_count.append(pipeline_framework::Job_Factory::convert_state_to_name(current_state));
         enqueue_job_count.push_back(count);
         one_second_timer_factory::Instance()->register_for_one_second_timer(
                 str_count,
@@ -92,14 +94,16 @@ void pipeline_framework::Scheduler_Factory::initialize(int argc, char **argv) {
 
         std::string str_count2(SCHEDULER_JOB);
         str_count2.append("enqueue_count-");
-        str_count2.append(pipeline_framework::Job_Factory::convert_state_to_name(index));
+        str_count2.append(pipeline_framework::Job_Factory::convert_state_to_name(current_state));
         dequeue_job_count.push_back(count);
 
         one_second_timer_factory::Instance()->register_for_one_second_timer(
                 str_count2,
                 pipeline_framework::Scheduler_Factory::Instance()->return_current_enqueue_done_count);
-    }
 
+        current_state = pipeline_framework::Job_Factory::get_next_state(current_state);
+    }
+#endif
     //Initialize thread factory.
     pipeline_framework::Thread_Factory::Instance()->Initialize_Thread_Factory();
 }
@@ -211,6 +215,7 @@ void pipeline_framework::Scheduler_Factory::run() {
             pipeline_framework::Job_Factory::Instance()->Enqueue_All_Jobs_to_specified_queue,
             (void *) *ptr_to_state);
 
+
     //Continuously keep monitoring all the threads.
     while (is_webclient_alive()) {
         //sleep(1);
@@ -249,6 +254,7 @@ void pipeline_framework::Scheduler_Factory::run() {
             }
         }
     }
+
 }
 
 /**
@@ -265,21 +271,25 @@ void pipeline_framework::Scheduler_Factory::Perform_a_Job(uint8_t state_id) {
     LOG_DEBUG("\n%s:%s:%d Before invoking condition_wait(). state=(%d)\n",
             __FILE__, __FUNCTION__, __LINE__,
             state_id);
-    uint64_t *p_job_id = (uint64_t *) pipeline_framework::Mutex_Factory::Instance()->condition_wait(
+    uint64_t job_id = (uint64_t) pipeline_framework::Mutex_Factory::Instance()->condition_wait(
             state_id,
             pipeline_framework::Scheduler_Factory::Dequeue_Job,
             (void *) *ptr_to_state);
-    if (!p_job_id) {
+    if (job_id >= 0) {
         LOG_DEBUG("\n%s:%s:%d Found a job. state=(%d)\n",
                 __FILE__, __FUNCTION__, __LINE__,
                 state_id);
-        pipeline_framework::Scheduler_Factory::Instance()->dequeue_job_count[state_id] += 1;
-        int return_code = Scheduler_Factory::Execute_Job(*p_job_id);
+        //pipeline_framework::Scheduler_Factory::Instance()->dequeue_job_count[state_id] += 1;
+        int return_code = Scheduler_Factory::Execute_Job((uint64_t) job_id);
+
         if (return_code == SUCCESS) {
-            Scheduler_Factory::Move_Job(*p_job_id);
+            Scheduler_Factory::Move_Job(state_id, (uint64_t) job_id);
         } else {
             //Move all jobs to init state.
-            //Scheduler_Factory::run();
+            pipeline_framework::Mutex_Factory::Instance()->condition_signal(
+                    pipeline_framework::Job_Factory::get_init_state(),
+                    pipeline_framework::Job_Factory::Instance()->move_current_job_to_init_state,
+                    (void *) job_id);
         }
 
     } else {
@@ -308,8 +318,10 @@ void* pipeline_framework::Scheduler_Factory::Dequeue_Job(void *p_state) {
                 __FUNCTION__, __LINE__);
         return p_job;
     }
-    LOG_DEBUG("%s:%s:%d state=%d,is_empty=%d\n", __FILE__, __FUNCTION__, __LINE__,
-            state_id, pipeline_framework::Queue_Factory::Instance()->is_empty(state_id));
+    LOG_DEBUG("state=%d,is_empty=%d total_number_of_jobs_in_queue=%ld\n",
+            state_id,
+            pipeline_framework::Queue_Factory::Instance()->is_empty(state_id),
+            pipeline_framework::Queue_Factory::Instance()->count(state_id));
 
     if (!pipeline_framework::Queue_Factory::Instance()->is_empty(state_id)) {
         //p_job = (webclient::Job *) calloc(1,sizeof(webclient::Job));
@@ -320,10 +332,10 @@ void* pipeline_framework::Scheduler_Factory::Dequeue_Job(void *p_state) {
                 (void **) &p_job,
                 &length);
 
-        LOG_DEBUG("%s:%s:%d p_job=%p,length=%d\n", __FILE__, __FUNCTION__, __LINE__,
-                p_job, length);
+        LOG_DEBUG("p_job=%ld,length=%d\n", (uint64_t) p_job, length);
     } else {
-        LOG_DEBUG("%s:%s:%d state=%d. Queue is empty.\n", __FILE__, __FUNCTION__, __LINE__,
+        LOG_DEBUG("%s:%s:%d state=%d. Queue is empty.\n",
+                __FILE__, __FUNCTION__, __LINE__,
                 state_id);
     }
 
@@ -350,7 +362,9 @@ int pipeline_framework::Scheduler_Factory::Execute_Job(uint64_t job_id) {
  * Note that this has to wake up by signaling the sleeping thread of the next queue.
  * @param p_job
  */
-void pipeline_framework::Scheduler_Factory::Move_Job(uint64_t job_id) {
+void pipeline_framework::Scheduler_Factory::Move_Job(
+        uint8_t state_id,
+        uint64_t job_id) {
     if (!job_id) {
         LOG_ERROR("%s:%s:%d p_job is NULL\n", __FILE__, __FUNCTION__, __LINE__);
         return;
@@ -358,13 +372,13 @@ void pipeline_framework::Scheduler_Factory::Move_Job(uint64_t job_id) {
 
     LOG_DEBUG("Scheduler_Factory Job_Factory::Instance()->move_Job()\n");
 
-    //uint8_t next_state = webclient::State_Factory::get_next_state(job_id);
+    uint8_t next_state = pipeline_framework::Job_Factory::Instance()->get_next_state(state_id);
 
-    //webclient::Mutex_Factory::Instance()->condition_signal(
-    //        next_state,
-    //        webclient::Job_Factory::Instance()->move_Job,
-    //        (void *) job_id);
-    //webclient::Scheduler_Factory::Instance()->enqueue_job_count[p_job->return_current_job_state()] += 1;
+    pipeline_framework::Mutex_Factory::Instance()->condition_signal(
+            next_state,
+            pipeline_framework::Job_Factory::Instance()->move_Job,
+            (void *) job_id);
+    //pipeline_framework::Scheduler_Factory::Instance()->enqueue_job_count[state_id] += 1;
 }
 
 /**

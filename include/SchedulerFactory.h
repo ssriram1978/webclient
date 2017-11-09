@@ -36,7 +36,7 @@ namespace pipeline_framework {
         static void Perform_a_Job(uint8_t state_id);
         static void* Dequeue_Job(void *p_state);
         static int Execute_Job(uint64_t job_id);
-        static void Move_Job(uint64_t job_id);
+        static void Move_Job(uint8_t state_id, uint64_t job_id);
         static long return_current_dequeue_done_count(void *arg);
         static long return_current_enqueue_done_count(void *arg);
     };

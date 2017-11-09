@@ -129,8 +129,8 @@ void pipeline_framework::Mutex_Factory::condition_signal(uint8_t state_type,
         (*p_call_back_function)(p_job);
     }
 
-    LOG_DEBUG("%s:%d state=%d Invoking pthread_cond_signal()\n",
-            __FUNCTION__, __LINE__, state_type);
+    //LOG_DEBUG("%s:%d state=%d Invoking pthread_cond_signal()\n",
+    //        __FUNCTION__, __LINE__, state_type);
 
     status = pthread_cond_signal(p_cond);
     if (status != 0) {

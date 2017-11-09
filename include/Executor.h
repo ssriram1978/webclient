@@ -91,6 +91,7 @@ namespace pipeline_framework {
 
         void get_all_jobs(std::vector<uint64_t> &job_identifiers);
         int process_job(uint64_t job_identifier);
+        void print_job(uint64_t job_identifier);
         std::string convert_state_to_name(uint8_t state_val);
     };
 }
