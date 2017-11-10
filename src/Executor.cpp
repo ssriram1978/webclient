@@ -450,7 +450,7 @@ int pipeline_framework::Executor::socket_creator(void *p_job_details) {
     p_job->socket_file_descriptor = socket(AF_INET, SOCK_STREAM, 0);
 
     if (p_job->socket_file_descriptor < 0) {
-        LOG_ERROR("Error opening socket.\n");
+        LOG_DEBUG("Error opening socket.\n");
         return FAILURE;
     } else {
         LOG_DEBUG("Successfully opened socket with fd=%d.\n", p_job->socket_file_descriptor);
