@@ -12,12 +12,39 @@
  */
 
 #include <Log.h>
+#define _XOPEN_SOURCE 700
+#define _BSD_SOURCE
+#include <iostream>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <pthread.h>
+#include <assert.h>
+#include <stdbool.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
+#include <arpa/inet.h>
+#include <netdb.h> /* getprotobyname */
+#include <netinet/in.h>
+#include <sys/socket.h>
+#include <unistd.h>
+#include <errno.h> //For errno - the error number
+
+#include <map>
+#include <vector>
+
+#include <sys/timeb.h>
+#include <string>
+#include <syscall.h>
 
 using namespace std;
 
 static char gProcessName[PROCESS_NAME_LEN] = "WEBCLIENT";
 static char gPid[PROCESS_ID_LEN] = "0";
+
+LogLevel gCommonLogLevel = LOGLEVEL_DEBUG;
 
 static map<string, LogLevel> loglevels;
 

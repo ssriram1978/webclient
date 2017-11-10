@@ -27,9 +27,9 @@ void* stdin_cb_fn(void *arg) {
 
     while (pipeline_framework::is_webclient_alive()) {
         char input_command[100] = {0};
-        LOG_EMERG("\nEnter your command:");
+        printf("\nEnter your command:");
         scanf("%s", input_command);
-        LOG_EMERG("\nYou entered %s", input_command);
+        printf("\nYou entered %s", input_command);
 
         switch (input_command[0]) {
             case '1':
@@ -70,6 +70,33 @@ void* stdin_cb_fn(void *arg) {
             }
                 break;
 
+            case 'd':
+            {
+                //set the debug level.
+                switch (atoi((const char *) (input_command + 1))) {
+                    case 0:
+                        setLogLevel("DEBUG");
+                        break;
+
+                    case 1:
+                        setLogLevel("INFO");
+                        break;
+
+                    case 2:
+                        setLogLevel("NOTICE");
+                        break;
+
+                    case 3:
+                        setLogLevel("ERROR");
+                        break;
+
+                    default:
+                        setLogLevel("NOTICE");
+                        break;
+                }
+            }
+                break;
+
             case '3':
             {
                 //turn off printing the counts.
@@ -84,7 +111,7 @@ void* stdin_cb_fn(void *arg) {
         }
     }
 
-    LOG_EMERG("%s thread exiting", threadName);
+    printf("%s thread exiting", threadName);
 
     return NULL;
 }

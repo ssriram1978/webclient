@@ -17,6 +17,8 @@
 #include "one_second_timer.h"
 #include "ThreadFactory.h"
 
+extern LogLevel gCommonLogLevel;
+
 pipeline_framework::Scheduler_Factory* pipeline_framework::Scheduler_Factory::m_pInstance = NULL;
 
 /**
@@ -223,6 +225,7 @@ void pipeline_framework::Scheduler_Factory::run() {
         for (int index = pipeline_framework::Job_Factory::get_init_state();
                 index < pipeline_framework::Job_Factory::get_total_number_of_states();
                 index++) {
+#if 0
             if (!pipeline_framework::Queue_Factory::Instance()->is_empty(index) &&
                     pipeline_framework::Queue_Factory::Instance()->is_this_queue_currently_processed_by_a_thread(
                     index) == FALSE) {
@@ -231,7 +234,7 @@ void pipeline_framework::Scheduler_Factory::run() {
                         NULL,
                         NULL);
             }
-
+#endif
             //Spawn new thread based upon the current queue count.
             int current_queue_count = pipeline_framework::Queue_Factory::Instance()->count(index);
 

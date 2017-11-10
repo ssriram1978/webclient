@@ -14,6 +14,8 @@
 #include "QueueFactory.h"
 #include "one_second_timer.h"
 
+extern LogLevel gCommonLogLevel;
+
 pipeline_framework::Queue_Factory* pipeline_framework::Queue_Factory::m_pInstance = NULL;
 
 /**

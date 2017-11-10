@@ -15,6 +15,8 @@
 #include "one_second_timer.h"
 #include "JobFactory.h"
 
+extern LogLevel gCommonLogLevel;
+
 //extern int is_webclient_alive();
 
 pipeline_framework::Thread_Factory* pipeline_framework::Thread_Factory::p_thread_factory = NULL;

@@ -15,6 +15,8 @@
 #include "Executor.h"
 #include "Log.h"
 
+extern LogLevel gCommonLogLevel;
+
 /**
  * WebClientFactory Constructor
  */

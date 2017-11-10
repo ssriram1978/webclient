@@ -13,6 +13,8 @@
 
 #include "one_second_timer.h"
 
+extern LogLevel gCommonLogLevel;
+
 //extern uint8_t is_webclient_alive();
 
 pipeline_framework::one_second_timer_factory* pipeline_framework::one_second_timer_factory::p_one_second_timer_factory = NULL;

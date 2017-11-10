@@ -33,7 +33,7 @@ int pipeline_framework::is_webclient_alive() {
  * @param dummy
  */
 void INThandler(int dummy) {
-    LOG_ERROR("INThandler: Exiting...\n");
+    //LOG_ERROR("INThandler: Exiting...\n");
     time_to_exit = 1;
 }
 

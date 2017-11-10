@@ -20,7 +20,7 @@
 //extern "C" {
 //#endif
 
-#include "pipeline_framework.h"
+
 
 #define STR(x) #x
 #define XSTR(x) STR(x)
@@ -39,7 +39,6 @@ typedef enum {
     LOGLEVEL_VERBOSE
 } LogLevel;
 
-static LogLevel gCommonLogLevel = LOGLEVEL_DEBUG;
 
 #define PROCESS_NAME_LEN     25
 #define PROCESS_ID_LEN       25

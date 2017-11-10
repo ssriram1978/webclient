@@ -14,6 +14,8 @@
 #include "QueueFactory.h"
 #include "Executor.h"
 
+extern LogLevel gCommonLogLevel;
+
 pipeline_framework::Job_Factory* pipeline_framework::Job_Factory::m_pInstance = NULL;
 pipeline_framework::Executor* pipeline_framework::Job_Factory::p_Executor = NULL;
 

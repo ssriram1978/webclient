@@ -56,7 +56,6 @@ namespace pipeline_framework {
 #define FALSE 0
 
     extern int is_webclient_alive();
-
 }
 
 #endif
