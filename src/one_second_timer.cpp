@@ -37,7 +37,7 @@ pipeline_framework::one_second_timer_factory *pipeline_framework::one_second_tim
  */
 void* pipeline_framework::one_second_timer_factory::one_sec_timer(void *args) {
     pthread_setname_np(pthread_self(),
-            "ONE_SEC_TIMER_THREAD");
+            "ONE_SEC_TIMER");
 
     pipeline_framework::one_second_timer_factory::Instance()->print_stats = 0;
 

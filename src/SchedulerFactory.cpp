@@ -223,7 +223,9 @@ void pipeline_framework::Scheduler_Factory::run() {
         for (int index = pipeline_framework::Job_Factory::get_init_state();
                 index < pipeline_framework::Job_Factory::get_total_number_of_states();
                 index++) {
-            if (!pipeline_framework::Queue_Factory::Instance()->is_empty(index)) {
+            if (!pipeline_framework::Queue_Factory::Instance()->is_empty(index) &&
+                    pipeline_framework::Queue_Factory::Instance()->is_this_queue_currently_processed_by_a_thread(
+                    index) == FALSE) {
                 pipeline_framework::Mutex_Factory::Instance()->condition_signal(
                         index,
                         NULL,
@@ -271,6 +273,10 @@ void pipeline_framework::Scheduler_Factory::Perform_a_Job(uint8_t state_id) {
     LOG_DEBUG("\n%s:%s:%d Before invoking condition_wait(). state=(%d)\n",
             __FILE__, __FUNCTION__, __LINE__,
             state_id);
+    pipeline_framework::Queue_Factory::Instance()->set_is_thread_processing_in_progress(
+            state_id,
+            TRUE);
+
     uint64_t job_id = (uint64_t) pipeline_framework::Mutex_Factory::Instance()->condition_wait(
             state_id,
             pipeline_framework::Scheduler_Factory::Dequeue_Job,
@@ -280,7 +286,7 @@ void pipeline_framework::Scheduler_Factory::Perform_a_Job(uint8_t state_id) {
                 __FILE__, __FUNCTION__, __LINE__,
                 state_id);
         //pipeline_framework::Scheduler_Factory::Instance()->dequeue_job_count[state_id] += 1;
-        int return_code = Scheduler_Factory::Execute_Job((uint64_t) job_id);
+        int return_code = Scheduler_Factory::Execute_Job(state_id, (uint64_t) job_id);
 
         if (return_code == SUCCESS) {
             Scheduler_Factory::Move_Job(state_id, (uint64_t) job_id);
@@ -297,6 +303,10 @@ void pipeline_framework::Scheduler_Factory::Perform_a_Job(uint8_t state_id) {
                 __FILE__, __FUNCTION__, __LINE__,
                 state_id);
     }
+    pipeline_framework::Queue_Factory::Instance()->set_is_thread_processing_in_progress(
+            state_id,
+            FALSE);
+
 }
 
 /**
@@ -323,6 +333,7 @@ void* pipeline_framework::Scheduler_Factory::Dequeue_Job(void *p_state) {
             pipeline_framework::Queue_Factory::Instance()->is_empty(state_id),
             pipeline_framework::Queue_Factory::Instance()->count(state_id));
 
+
     if (!pipeline_framework::Queue_Factory::Instance()->is_empty(state_id)) {
         //p_job = (webclient::Job *) calloc(1,sizeof(webclient::Job));
         p_job = NULL;
@@ -339,6 +350,7 @@ void* pipeline_framework::Scheduler_Factory::Dequeue_Job(void *p_state) {
                 state_id);
     }
 
+
     return (void *) p_job;
 }
 
@@ -347,13 +359,16 @@ void* pipeline_framework::Scheduler_Factory::Dequeue_Job(void *p_state) {
  * @param p_job
  * @return
  */
-int pipeline_framework::Scheduler_Factory::Execute_Job(uint64_t job_id) {
-    if (!job_id) {
+int pipeline_framework::Scheduler_Factory::Execute_Job(
+        uint8_t state_id,
+        uint64_t job_id) {
+    if (job_id < 0) {
         LOG_ERROR("%s:%s:%d p_job is NULL\n", __FILE__, __FUNCTION__, __LINE__);
         return FAILURE;
     }
 
-    LOG_DEBUG("Scheduler_Factory Job_Factory::Instance()->run_Job()\n");
+    LOG_DEBUG("Going to run the job (%ld) on this state (%d)\n",
+            job_id, state_id);
     return pipeline_framework::Job_Factory::Instance()->run_Job(job_id);
 }
 
@@ -365,14 +380,16 @@ int pipeline_framework::Scheduler_Factory::Execute_Job(uint64_t job_id) {
 void pipeline_framework::Scheduler_Factory::Move_Job(
         uint8_t state_id,
         uint64_t job_id) {
-    if (!job_id) {
+    if (job_id < 0) {
         LOG_ERROR("%s:%s:%d p_job is NULL\n", __FILE__, __FUNCTION__, __LINE__);
         return;
     }
 
-    LOG_DEBUG("Scheduler_Factory Job_Factory::Instance()->move_Job()\n");
-
     uint8_t next_state = pipeline_framework::Job_Factory::Instance()->get_next_state(state_id);
+
+    LOG_DEBUG("Conditional signal to move this job(%ld) to this queue(%d).\n",
+            job_id,
+            next_state);
 
     pipeline_framework::Mutex_Factory::Instance()->condition_signal(
             next_state,

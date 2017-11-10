@@ -52,6 +52,8 @@ namespace pipeline_framework {
 #define SUCCESS 1
 #define FAILURE 2
 
+#define TRUE 1
+#define FALSE 0
 
     extern int is_webclient_alive();
 

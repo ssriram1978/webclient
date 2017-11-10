@@ -441,6 +441,7 @@ int pipeline_framework::Executor::socket_creator(void *p_job_details) {
 
     if (p_job->socket_file_descriptor > 0) {
         LOG_NOTICE("Closing socket with fd=%d.\n", p_job->socket_file_descriptor);
+        close(p_job->socket_file_descriptor);
         p_job->socket_file_descriptor = 0;
     }
 
@@ -636,7 +637,7 @@ int pipeline_framework::Executor::socket_reader(void *p_job_details) {
             BUFSIZ)) > 0) {
         //fprintf(stderr, "debug: after a read\n");
         //write(STDOUT_FILENO, buffer, nbytes_total);
-        LOG_DEBUG("Read Length=%ld %s \n", nbytes_total, buffer);
+        //LOG_DEBUG("Read Length=%ld %s \n", nbytes_total, buffer);
     }
     //fprintf(stderr, "debug: after last read\n");
 

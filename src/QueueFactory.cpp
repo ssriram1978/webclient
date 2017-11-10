@@ -131,8 +131,7 @@ uint8_t pipeline_framework::Queue_Factory::enqueue(uint8_t queue_type,
     msgq_node *temp = NULL;
     uint8_t msq_send_return_code = -1;
 
-    if (!message ||
-            (message_size <= 0) ||
+    if ((message_size <= 0) ||
             (queue_type < 0) ||
             (queue_type >= total_number_of_queues)) {
         LOG_ERROR("%s:%d Invalid input parameters.\n", __FILE__, __LINE__);
@@ -224,24 +223,64 @@ void pipeline_framework::Queue_Factory::dequeue(uint8_t queue_type, void **ppMes
  * @return
  */
 uint8_t pipeline_framework::Queue_Factory::is_empty(uint8_t queue_type) {
-    uint8_t are_there_messages_in_msgQ = 1;
+    uint8_t is_empty = 1;
 
     if ((queue_type < 0) ||
             (queue_type >= total_number_of_queues)) {
         LOG_ERROR("%s:%d  Input parameters are invalid.\n", __FILE__, __LINE__);
-        return are_there_messages_in_msgQ;
+        return is_empty;
     }
 
     if (!(p_g_msgQ + queue_type)) {
         LOG_ERROR("%s:%d p_g_msgQ is not initialized for %d.\n", __FILE__, __LINE__, queue_type);
-        return are_there_messages_in_msgQ;
+        return is_empty;
     }
 
-    if ((p_g_msgQ + queue_type)->pFront != NULL) {
-        are_there_messages_in_msgQ = 0;
+    //if ((p_g_msgQ + queue_type)->pFront != NULL) {
+    //    is_empty = 0;
+    //}
+
+    if ((p_g_msgQ + queue_type)->count > 0) {
+        is_empty = 0;
     }
 
-    return are_there_messages_in_msgQ;
+    return is_empty;
+}
+
+uint8_t pipeline_framework::Queue_Factory::is_this_queue_currently_processed_by_a_thread(
+        uint8_t queue_type) {
+    uint8_t is_this_queue_currently_processed_by_a_thread = FALSE;
+
+    if ((queue_type < 0) ||
+            (queue_type >= total_number_of_queues)) {
+        LOG_ERROR("%s:%d  Input parameters are invalid.\n", __FILE__, __LINE__);
+        return is_this_queue_currently_processed_by_a_thread;
+    }
+
+    if (!(p_g_msgQ + queue_type)) {
+        LOG_ERROR("%s:%d p_g_msgQ is not initialized for %d.\n", __FILE__, __LINE__, queue_type);
+        return is_this_queue_currently_processed_by_a_thread;
+    }
+
+    return (p_g_msgQ + queue_type)->is_thread_processing_in_progress;
+}
+
+void pipeline_framework::Queue_Factory::set_is_thread_processing_in_progress(
+        uint8_t queue_type,
+        uint8_t is_thread_processing_in_progress) {
+
+    if ((queue_type < 0) ||
+            (queue_type >= total_number_of_queues)) {
+        LOG_ERROR("%s:%d  Input parameters are invalid.\n", __FILE__, __LINE__);
+        return;
+    }
+
+    if (!(p_g_msgQ + queue_type)) {
+        LOG_ERROR("%s:%d p_g_msgQ is not initialized for %d.\n", __FILE__, __LINE__, queue_type);
+        return;
+    }
+
+    (p_g_msgQ + queue_type)->is_thread_processing_in_progress = is_thread_processing_in_progress;
 }
 
 /**

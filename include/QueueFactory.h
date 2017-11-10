@@ -30,6 +30,7 @@ namespace pipeline_framework {
             msgq_node *pFront;
             msgq_node *pRear;
             long count;
+            uint8_t is_thread_processing_in_progress;
         } msgQ;
 
         msgQ *p_g_msgQ;
@@ -47,11 +48,15 @@ namespace pipeline_framework {
         uint8_t enqueue(uint8_t queue_type, void * message, uint32_t message_size);
         void dequeue(uint8_t queue_type, void **ppMessage, uint32_t *pMessageLength);
         uint8_t is_empty(uint8_t queue_type);
+        uint8_t is_this_queue_currently_processed_by_a_thread(uint8_t queue_type);
         void set_total_number_of_queues(uint8_t queue_total);
         void peek_at_the_front_of_queue(uint8_t queue_type,
                 void **ppMessage,
                 uint32_t *pMessageLength,
                 long location);
+        void set_is_thread_processing_in_progress(
+                uint8_t queue_type,
+                uint8_t is_thread_processing_in_progress);
         static Queue_Factory* Instance();
         static long return_current_queue_count(void *arg);
     };

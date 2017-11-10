@@ -91,7 +91,7 @@ void *pipeline_framework::Thread_Factory::thread_main_job(void *arg) {
 
     pthread_setname_np(pthread_self(),
             thread_name.c_str());
-
+#if 0
     //Register for one second timer event callback.
     std::string str_count(THREAD_PROCESSING_COUNT);
     str_count.append(thread_name);
@@ -99,6 +99,7 @@ void *pipeline_framework::Thread_Factory::thread_main_job(void *arg) {
     one_second_timer_factory::Instance()->register_for_one_second_timer(
             str_count,
             pipeline_framework::Thread_Factory::Instance()->return_current_thread_count);
+#endif
 
     while (pipeline_framework::is_webclient_alive()) {
         pipeline_framework::Thread_Factory::Pthread_variables *p_thread_var =
