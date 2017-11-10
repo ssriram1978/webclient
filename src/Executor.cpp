@@ -484,7 +484,11 @@ int pipeline_framework::Executor::socket_creator(void *p_job_details) {
      */
     if (bind(p_job->socket_file_descriptor, (struct sockaddr *) &clientaddr,
             sizeof (struct sockaddr_in)) < 0) {
-        LOG_ERROR("ERROR on binding.%d\n", p_job->socket_file_descriptor);
+
+        LOG_ERROR("ERROR on binding.socket=%d,local_port=%d\n",
+                p_job->socket_file_descriptor,
+                p_job->local_port);
+
         perror("bind failed. Error");
         return FAILURE;
     } else {
