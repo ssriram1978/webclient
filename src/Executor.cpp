@@ -490,6 +490,8 @@ int pipeline_framework::Executor::socket_creator(void *p_job_details) {
                 p_job->local_port);
 
         perror("bind failed. Error");
+        close(p_job->socket_file_descriptor);
+        p_job->socket_file_descriptor = 0;
         return FAILURE;
     } else {
         LOG_DEBUG("Successfully binded ip=%08x:%08x,port=%d for fd=%d.\n",
