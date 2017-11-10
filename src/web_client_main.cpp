@@ -77,7 +77,7 @@ int main(int argc, char **argv) {
     pipeline_framework::Scheduler_Factory::Instance()->Process_this_Job(p_job);
     pipeline_framework::Scheduler_Factory::Instance()->Process_this_Job(p_job);
 #endif
-    sleep(1);
+    sleep(5);
     pipeline_framework::Scheduler_Factory::Instance()->run();
 
     return 1;

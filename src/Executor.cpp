@@ -239,14 +239,14 @@ uint64_t pipeline_framework::Executor::get_total_number_of_jobs() {
 }
 
 uint8_t pipeline_framework::Executor::get_current_state(uint64_t job_identifier) {
-    if ((job_identifier < 0) || (job_identifier >= total_number_of_jobs)) {
-        LOG_ERROR("Invalid job id(%ld).\n", job_identifier);
+    if ((job_identifier <= 0) || (job_identifier > total_number_of_jobs)) {
+        LOG_ERROR("Invalid job id(%ld).\n", (job_identifier - 1));
         return FAILURE;
     }
-    Job *p_current_job = (Job *) (p_jobs + job_identifier);
+    Job *p_current_job = (Job *) (p_jobs + (job_identifier - 1));
 
     if (!p_current_job) {
-        LOG_ERROR("Job cannot be found with (%ld).\n", job_identifier);
+        LOG_ERROR("Job cannot be found with (%ld).\n", (job_identifier - 1));
         return FAILURE;
     }
 
@@ -254,14 +254,14 @@ uint8_t pipeline_framework::Executor::get_current_state(uint64_t job_identifier)
 }
 
 void pipeline_framework::Executor::increment_iteration_count(uint64_t job_identifier) {
-    if ((job_identifier < 0) || (job_identifier >= total_number_of_jobs)) {
-        LOG_ERROR("Invalid job id(%ld).\n", job_identifier);
+    if ((job_identifier <= 0) || (job_identifier > total_number_of_jobs)) {
+        LOG_ERROR("Invalid job id(%ld).\n", (job_identifier - 1));
         return;
     }
-    Job *p_current_job = (Job *) (p_jobs + job_identifier);
+    Job *p_current_job = (Job *) (p_jobs + (job_identifier - 1));
 
     if (!p_current_job) {
-        LOG_ERROR("Job cannot be found with (%ld).\n", job_identifier);
+        LOG_ERROR("Job cannot be found with (%ld).\n", (job_identifier - 1));
         return;
     }
 
@@ -270,14 +270,14 @@ void pipeline_framework::Executor::increment_iteration_count(uint64_t job_identi
 
 void pipeline_framework::Executor::set_current_job_state(uint64_t job_identifier,
         uint8_t current_state) {
-    if ((job_identifier < 0) || (job_identifier >= total_number_of_jobs)) {
-        LOG_ERROR("Invalid job id(%ld).\n", job_identifier);
+    if ((job_identifier <= 0) || (job_identifier > total_number_of_jobs)) {
+        LOG_ERROR("Invalid job id(%ld).\n", (job_identifier - 1));
         return;
     }
-    Job *p_current_job = (Job *) (p_jobs + job_identifier);
+    Job *p_current_job = (Job *) (p_jobs + (job_identifier - 1));
 
     if (!p_current_job) {
-        LOG_ERROR("Job cannot be found with (%ld).\n", job_identifier);
+        LOG_ERROR("Job cannot be found with (%ld).\n", (job_identifier - 1));
         return;
     }
 
@@ -368,21 +368,21 @@ std::string pipeline_framework::Executor::convert_state_to_name(uint8_t state_va
 }
 
 void pipeline_framework::Executor::get_all_jobs(std::vector<uint64_t> &job_identifiers) {
-    for (uint64_t count = 0; count < total_number_of_jobs; count++) {
+    for (uint64_t count = 1; count <= total_number_of_jobs; count++) {
         //LOG_DEBUG("Pushing job id(%ld).\n", count);
         job_identifiers.push_back(count);
     }
 }
 
 int pipeline_framework::Executor::process_job(uint64_t job_identifier) {
-    if ((job_identifier < 0) || (job_identifier >= total_number_of_jobs)) {
-        LOG_ERROR("Invalid job id(%ld).\n", job_identifier);
+    if ((job_identifier <= 0) || (job_identifier > total_number_of_jobs)) {
+        LOG_ERROR("Invalid job id(%ld).\n", (job_identifier - 1));
         return FAILURE;
     }
-    Job *p_current_job = (Job *) (p_jobs + job_identifier);
+    Job *p_current_job = (Job *) (p_jobs + (job_identifier - 1));
 
     if (!p_current_job) {
-        LOG_ERROR("Job cannot be found with (%ld).\n", job_identifier);
+        LOG_ERROR("Job cannot be found with (%ld).\n", (job_identifier - 1));
         return FAILURE;
     }
 
@@ -392,14 +392,14 @@ int pipeline_framework::Executor::process_job(uint64_t job_identifier) {
 }
 
 void pipeline_framework::Executor::print_job(uint64_t job_identifier) {
-    if ((job_identifier < 0) || (job_identifier >= total_number_of_jobs)) {
-        LOG_ERROR("Invalid job id(%ld).\n", job_identifier);
+    if ((job_identifier <= 0) || (job_identifier > total_number_of_jobs)) {
+        LOG_ERROR("Invalid job id(%ld).\n", (job_identifier - 1));
         return;
     }
-    Job *p_current_job = (Job *) (p_jobs + job_identifier);
+    Job *p_current_job = (Job *) (p_jobs + (job_identifier - 1));
 
     if (!p_current_job) {
-        LOG_ERROR("Job cannot be found with (%ld).\n", job_identifier);
+        LOG_ERROR("Job cannot be found with (%ld).\n", (job_identifier - 1));
         return;
     }
     LOG_DEBUG("job_id=%ld,"
@@ -411,7 +411,7 @@ void pipeline_framework::Executor::print_job(uint64_t job_identifier) {
             "socket_file_descriptor=%d"
             "iteration_count=%ld"
             "\n",
-            job_identifier,
+            (job_identifier - 1),
             p_current_job->current_state,
             p_current_job->local_ipv4,
             p_current_job->local_port,

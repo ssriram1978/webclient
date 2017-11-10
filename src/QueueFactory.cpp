@@ -133,7 +133,8 @@ uint8_t pipeline_framework::Queue_Factory::enqueue(uint8_t queue_type,
     msgq_node *temp = NULL;
     uint8_t msq_send_return_code = -1;
 
-    if ((message_size <= 0) ||
+    if (!message ||
+            (message_size <= 0) ||
             (queue_type < 0) ||
             (queue_type >= total_number_of_queues)) {
         LOG_ERROR("%s:%d Invalid input parameters.\n", __FILE__, __LINE__);

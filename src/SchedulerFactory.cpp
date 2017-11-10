@@ -284,7 +284,7 @@ void pipeline_framework::Scheduler_Factory::Perform_a_Job(uint8_t state_id) {
             state_id,
             pipeline_framework::Scheduler_Factory::Dequeue_Job,
             (void *) *ptr_to_state);
-    if (job_id >= 0) {
+    if (job_id > 0) {
         LOG_DEBUG("\n%s:%s:%d Found a job. state=(%d)\n",
                 __FILE__, __FUNCTION__, __LINE__,
                 state_id);
@@ -365,7 +365,7 @@ void* pipeline_framework::Scheduler_Factory::Dequeue_Job(void *p_state) {
 int pipeline_framework::Scheduler_Factory::Execute_Job(
         uint8_t state_id,
         uint64_t job_id) {
-    if (job_id < 0) {
+    if (job_id <= 0) {
         LOG_ERROR("%s:%s:%d p_job is NULL\n", __FILE__, __FUNCTION__, __LINE__);
         return FAILURE;
     }
@@ -383,7 +383,7 @@ int pipeline_framework::Scheduler_Factory::Execute_Job(
 void pipeline_framework::Scheduler_Factory::Move_Job(
         uint8_t state_id,
         uint64_t job_id) {
-    if (job_id < 0) {
+    if (job_id <= 0) {
         LOG_ERROR("%s:%s:%d p_job is NULL\n", __FILE__, __FUNCTION__, __LINE__);
         return;
     }
