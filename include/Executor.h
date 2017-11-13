@@ -86,6 +86,8 @@ namespace pipeline_framework {
         uint8_t get_max_state();
         uint8_t get_current_state(uint64_t job_identifier);
         void increment_iteration_count(uint64_t job_identifier);
+        uint64_t get_iteration_count(uint64_t job_identifier);
+
         void set_current_job_state(uint64_t job_identifier,
                 uint8_t current_state);
 

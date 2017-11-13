@@ -39,6 +39,7 @@ namespace pipeline_framework {
         void set_current_job_state(void *p_job_id, uint8_t state);
         uint8_t get_current_job_state(void *p_job_id);
         void increment_iteration_count(void *p_job_id);
+        uint64_t get_iteration_count(void *p_job_id);
     };
 }
 #endif

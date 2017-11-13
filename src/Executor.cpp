@@ -268,6 +268,21 @@ void pipeline_framework::Executor::increment_iteration_count(uint64_t job_identi
     p_current_job->iteration_count++;
 }
 
+uint64_t pipeline_framework::Executor::get_iteration_count(uint64_t job_identifier) {
+    if ((job_identifier <= 0) || (job_identifier > total_number_of_jobs)) {
+        LOG_ERROR("Invalid job id(%ld).\n", (job_identifier - 1));
+        return -1;
+    }
+    Job *p_current_job = (Job *) (p_jobs + (job_identifier - 1));
+
+    if (!p_current_job) {
+        LOG_ERROR("Job cannot be found with (%ld).\n", (job_identifier - 1));
+        return -1;
+    }
+
+    return p_current_job->iteration_count;
+}
+
 void pipeline_framework::Executor::set_current_job_state(uint64_t job_identifier,
         uint8_t current_state) {
     if ((job_identifier <= 0) || (job_identifier > total_number_of_jobs)) {

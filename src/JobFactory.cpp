@@ -122,6 +122,17 @@ void pipeline_framework::Job_Factory::increment_iteration_count(void *p_job_id) 
     p_Executor->increment_iteration_count(job_id);
 }
 
+uint64_t pipeline_framework::Job_Factory::get_iteration_count(void *p_job_id) {
+    uint64_t job_id = (uint64_t) p_job_id;
+
+    if (job_id <= 0) {
+        LOG_ERROR("%s:%d  Input parameters are invalid.\n", __FUNCTION__, __LINE__);
+        return -1;
+    }
+
+    return p_Executor->get_iteration_count(job_id);
+}
+
 uint8_t pipeline_framework::Job_Factory::get_current_job_state(void *p_job_id) {
     if (p_job_id <= 0) {
         LOG_ERROR("%s:%d  Input parameters are invalid.\n", __FUNCTION__, __LINE__);
