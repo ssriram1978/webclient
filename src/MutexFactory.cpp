@@ -134,7 +134,7 @@ void pipeline_framework::Mutex_Factory::condition_signal(uint8_t state_type,
     //LOG_DEBUG("%s:%d state=%d Invoking pthread_cond_signal()\n",
     //        __FUNCTION__, __LINE__, state_type);
 
-    //status = pthread_cond_signal(p_cond);
+    status = pthread_cond_signal(p_cond);
     if (status != 0) {
         LOG_ERROR("%s:%d state=%d pthread_cond_wait failed\n",
                 __FUNCTION__, __LINE__, state_type);
@@ -190,9 +190,17 @@ void* pipeline_framework::Mutex_Factory::condition_wait(uint8_t state_type,
     LOG_DEBUG("%s:%d state=%d Invoking pthread_cond_wait()\n",
             __FUNCTION__, __LINE__, state_type);
 
-    //status = pthread_cond_wait(p_cond, p_mutex);
-    if (status != 0) {
-        LOG_ERROR("%s:%d state=%d pthread_cond_wait failed\n",
+    struct timespec ts;
+    ts.tv_nsec += 50;
+    clock_gettime(CLOCK_REALTIME, &ts);
+
+    status = pthread_cond_timedwait(p_cond, p_mutex, &ts);
+    if (status == ETIMEDOUT) {
+        LOG_DEBUG("%s:%d state=%d pthread_cond_timedwait timed out\n",
+                __FUNCTION__, __LINE__, state_type);
+        //dequeue and process the message.
+    } else {
+        LOG_ERROR("%s:%d state=%d pthread_cond_timedwait failed\n",
                 __FUNCTION__, __LINE__, state_type);
         return return_argument;
     }
