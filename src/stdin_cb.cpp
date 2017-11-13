@@ -54,7 +54,7 @@ void* stdin_cb_fn(void *arg) {
                                     (void **) &p_job,
                                     &length,
                                     count - 1);
-                            printf("For index=%p,iteration_count=%ld",
+                            printf("For index=%p,iteration_count=%ld\n",
                                     p_job,
                                     pipeline_framework::Job_Factory::Instance()->get_iteration_count(p_job));
 
