@@ -11,10 +11,7 @@
  * Created on October 11, 2017, 1:06 PM
  */
 #include "pipeline_framework.h"
-#include "JobFactory.h"
-#include "QueueFactory.h"
-#include "SchedulerFactory.h"
-#include "ThreadFactory.h"
+#include "JobScheduler.h"
 #include "stdin_cb.h"
 #include  <signal.h>
 
@@ -55,7 +52,7 @@ int main(int argc, char **argv) {
             &stdin_cb_fn,
             NULL);
 
-    pipeline_framework::Scheduler_Factory::Instance()->initialize(argc, argv);
+    pipeline_framework::Job_Scheduler::Instance()->initialize(argc, argv);
 
 
 
@@ -68,17 +65,17 @@ int main(int argc, char **argv) {
     printf("%s:%s:%d pmsg=%p,length=%d\n", __FILE__, __FUNCTION__, __LINE__,
             p_job, length);
 
-    pipeline_framework::Scheduler_Factory::Instance()->Process_this_Job(p_job);
-    pipeline_framework::Scheduler_Factory::Instance()->Process_this_Job(p_job);
-    pipeline_framework::Scheduler_Factory::Instance()->Process_this_Job(p_job);
-    pipeline_framework::Scheduler_Factory::Instance()->Process_this_Job(p_job);
-    pipeline_framework::Scheduler_Factory::Instance()->Process_this_Job(p_job);
-    pipeline_framework::Scheduler_Factory::Instance()->Process_this_Job(p_job);
-    pipeline_framework::Scheduler_Factory::Instance()->Process_this_Job(p_job);
-    pipeline_framework::Scheduler_Factory::Instance()->Process_this_Job(p_job);
+    pipeline_framework::Job_Scheduler::Instance()->Process_this_Job(p_job);
+    pipeline_framework::Job_Scheduler::Instance()->Process_this_Job(p_job);
+    pipeline_framework::Job_Scheduler::Instance()->Process_this_Job(p_job);
+    pipeline_framework::Job_Scheduler::Instance()->Process_this_Job(p_job);
+    pipeline_framework::Job_Scheduler::Instance()->Process_this_Job(p_job);
+    pipeline_framework::Job_Scheduler::Instance()->Process_this_Job(p_job);
+    pipeline_framework::Job_Scheduler::Instance()->Process_this_Job(p_job);
+    pipeline_framework::Job_Scheduler::Instance()->Process_this_Job(p_job);
 #endif
     sleep(5);
-    pipeline_framework::Scheduler_Factory::Instance()->run();
+    pipeline_framework::Job_Scheduler::Instance()->run();
 
     return 1;
 }

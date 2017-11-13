@@ -11,7 +11,7 @@
  * Created on October 31, 2017, 1:06 PM
  */
 #include "ThreadFactory.h"
-#include "SchedulerFactory.h"
+#include "JobScheduler.h"
 #include "one_second_timer.h"
 #include "JobFactory.h"
 
@@ -107,7 +107,7 @@ void *pipeline_framework::Thread_Factory::thread_main_job(void *arg) {
         pipeline_framework::Thread_Factory::Pthread_variables *p_thread_var =
                 pipeline_framework::Thread_Factory::Instance()->thread_var[thread_id];
 
-        pipeline_framework::Scheduler_Factory::Perform_a_Job(thread_id);
+        pipeline_framework::Job_Scheduler::Perform_a_Job(thread_id);
 
         if (p_thread_var) {
             //p_thread_var->current_job_count[thread_id]+=1;

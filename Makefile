@@ -26,7 +26,7 @@ web_client_cpp_sources = \
         src/QueueFactory.cpp \
         src/JobFactory.cpp \
         src/MutexFactory.cpp \
-        src/SchedulerFactory.cpp \
+        src/JobScheduler.cpp \
         src/ThreadFactory.cpp \
         src/web_client_main.cpp \
 	src/stdin_cb.cpp \

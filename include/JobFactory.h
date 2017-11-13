@@ -28,15 +28,17 @@ namespace pipeline_framework {
         ~Job_Factory();
         void create_Jobs(int argc, char **argv);
         int run_Job(uint64_t job_id);
-        static void move_Job(void *p_job_id);
-        static void Enqueue_All_Jobs_to_specified_queue(void *p_queue_id);
-        static void move_current_job_to_init_state(void *p_job_id);
         static Job_Factory* Instance();
         static uint64_t get_total_number_of_Jobs();
         static uint8_t get_total_number_of_states();
         static std::string convert_state_to_name(uint8_t state_val);
         static uint8_t get_init_state();
         static uint8_t get_next_state(uint8_t current_state);
+        static uint8_t get_max_state();
+        void get_all_jobs(std::vector<uint64_t> &job_identifiers);
+        void set_current_job_state(void *p_job_id, uint8_t state);
+        uint8_t get_current_job_state(void *p_job_id);
+        void increment_iteration_count(void *p_job_id);
     };
 }
 #endif
