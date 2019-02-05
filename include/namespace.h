@@ -13,8 +13,7 @@
 #ifndef NAMESPACE_H
 #define NAMESPACE_H
 
-#define _XOPEN_SOURCE 700
-#define _BSD_SOURCE
+#define _DEFAULT_SOURCE
 #include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
