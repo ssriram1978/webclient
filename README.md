@@ -4,9 +4,9 @@ This is a HTTP WEB CLIENT Traffic Generator written in C++.
 
 The idea behind this framework is simple.
 The user provides this framework with the job details that needs to be performed such as
-1. Total number of jobs to be executed.
-2. Job specific parameters.
-3. Tasks to be performed at each stage.
+         1. Total number of jobs to be executed.
+         2. Job specific parameters.
+         3. Tasks to be performed at each stage.
 
 Imagine a car assembly line Factory where a skeleton of the car is provided as the input to the stage1.
 At each stage, the car is assembled with more body parts and moved on to the next stage.
