@@ -43,3 +43,6 @@ options: [-d <dbglvl 0-DEBUG,1-INFO,2-NOTICE,3-ERROR>]
          [-l <local ipaddr>]
          [-r <remote ip or domain name>]
 
+![](webclient_class_diagram.PNG)
+
+![](webclient_sequence_diagram.png)
