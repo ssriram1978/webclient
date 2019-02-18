@@ -29,7 +29,13 @@ Compile:
 --------
 Just do make in the webclient directory.
 
+Dependencies:
+-------------
+sudo apt-get install build-essential
+sudo apt-get install libz-dev
+
 Run:
+----
 ./WEBCLIENT --help
 options: [-d <dbglvl 0-DEBUG,1-INFO,2-NOTICE,3-ERROR>]
          [-s <starting port>]
