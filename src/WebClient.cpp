@@ -71,16 +71,20 @@ int webclient::WebClientFactory::socket_creator(void *p_job_details) {
 
     if (p_job->socket_file_descriptor > 0) {
         LOG_NOTICE("Closing socket with fd=%d.\n", p_job->socket_file_descriptor);
+	close(p_job->socket_file_descriptor);
         p_job->socket_file_descriptor = 0;
     }
-
+    bool is_socket_open = false;
+    while (!is_socket_open) {
     p_job->socket_file_descriptor = socket(AF_INET, SOCK_STREAM, 0);
 
     if (p_job->socket_file_descriptor < 0) {
         LOG_ERROR("Error opening socket.\n");
-        return FAILURE;
+        //return FAILURE;
     } else {
         LOG_DEBUG("Successfully opened socket with fd=%d.\n", p_job->socket_file_descriptor);
+	is_socket_open = true;
+    }
     }
     /* setsockopt: Handy debugging trick that lets
      * us rerun the server immediately after we kill it;
@@ -109,17 +113,21 @@ int webclient::WebClientFactory::socket_creator(void *p_job_details) {
     /*
      * bind: associate the parent socket with a port
      */
+    bool is_bind_success = false;
+    while(!is_bind_success) {
     if (bind(p_job->socket_file_descriptor, (struct sockaddr *) &clientaddr,
             sizeof (struct sockaddr_in)) < 0) {
-        LOG_ERROR("ERROR on binding.%d\n", p_job->socket_file_descriptor);
+        LOG_ERROR("ERROR on binding.socket_fd = %d, local_port = %d\n", p_job->socket_file_descriptor, p_job->local_port);
         perror("bind failed. Error");
-        return FAILURE;
+        //return FAILURE;
     } else {
-        LOG_DEBUG("Successfully binded ip=%08x:%08x,port=%d for fd=%d.\n",
+        LOG_DEBUG("Successfully binded ip=%08x:%08x,local_port=%d for fd=%d.\n",
                 p_job->local_ipv4,
                 clientaddr.sin_addr.s_addr,
                 p_job->local_port,
                 p_job->socket_file_descriptor);
+	is_bind_success = true;
+    }
     }
     return SUCCESS;
 }
@@ -154,24 +162,29 @@ int webclient::WebClientFactory::socket_connect(void *p_job_details) {
 
     uint16_t server_port = 80;
     serveraddr.sin_port = htons(server_port);
-
+    bool isConnected = false;
+    while(!isConnected) {
     /* connect: create a connection with the server */
     int return_code = connect(p_job->socket_file_descriptor,
             (struct sockaddr *) &serveraddr,
             sizeof (struct sockaddr_in));
 
     if (return_code < 0) {
-        LOG_ERROR("fd=%d,ERROR connecting server ip=%08x:%08x.rc=%d\n",
+        LOG_ERROR("fd=%d,ERROR connecting server ip=%08x:%08x,local_port=%d.rc=%d\n",
                 p_job->socket_file_descriptor,
                 p_job->remote_ipv4,
                 serveraddr.sin_addr.s_addr,
+                p_job->local_port,
                 return_code);
         perror("connect failed. Error");
-        return FAILURE;
+        //return FAILURE;
     } else {
-        LOG_DEBUG("Successfully connected to remote ip=%d for fd=%d.\n",
+        LOG_DEBUG("Successfully connected to remote ip=%d local_port = %d, for fd=%d.\n",
                 p_job->remote_ipv4,
+		p_job->local_port,
                 p_job->socket_file_descriptor);
+	isConnected = true;
+    }
     }
     return SUCCESS;
 }
@@ -302,5 +315,7 @@ int webclient::WebClientFactory::socket_destroyer(void *p_job_details) {
     }
 
     close(p_job->socket_file_descriptor);
+    LOG_DEBUG("successfully closed socket fd =%d local_port = %d.\n",p_job->socket_file_descriptor, p_job->local_port);
+    p_job->socket_file_descriptor = -1;
     return SUCCESS;
 }

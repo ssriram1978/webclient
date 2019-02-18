@@ -43,7 +43,7 @@ void* webclient::one_second_timer_factory::one_sec_timer(void *args) {
 
     std::map<std::string, call_back_fn_ptr>::iterator iterator;
 
-    sleep(5);
+    //sleep(5);
 
     while (webclient::is_webclient_alive()) {
         for (iterator = webclient::one_second_timer_factory::Instance()->timer_map.begin();
