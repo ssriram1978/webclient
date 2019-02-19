@@ -45,7 +45,7 @@ namespace webclient {
 
         ~State_Factory();
     public:
-        static uint8_t get_total_number_of_states();
+        static int8_t get_total_number_of_states();
         static uint8_t get_init_state();
         static int run_job_on_this_current_state(uint8_t state, void *p_job_details);
         static uint8_t get_next_state(uint8_t current_state);

@@ -59,7 +59,7 @@ webclient::Thread_Factory::~Thread_Factory() {
     }
 }
 
-#define THREAD_PROCESSING_COUNT "thread-processing-count-"
+#define THREAD_PROCESSING_COUNT "PTHREAD-"
 
 /**
  * thread_main_job This is the main thread processing logic.
@@ -201,11 +201,11 @@ void webclient::Thread_Factory::Create_Thread(uint8_t index) {
  * Initialize_Thread_Factory Create one thread for each state.
  */
 void webclient::Thread_Factory::Initialize_Thread_Factory() {
-    uint8_t total_number_of_threads = 0;
+    int8_t total_number_of_threads = 0;
 
     total_number_of_threads = webclient::State_Factory::get_total_number_of_states();
 
-    if (total_number_of_threads < 0) {
+    if (total_number_of_threads <= 0) {
         LOG_ERROR("\nInvalid number of states");
         return;
     }

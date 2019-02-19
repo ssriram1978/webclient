@@ -95,7 +95,7 @@ webclient::State_Factory::~State_Factory() {
  * get_total_number_of_states Helper function that returns the total number of states.
  * @return unsigned char.
  */
-uint8_t webclient::State_Factory::get_total_number_of_states() {
+int8_t webclient::State_Factory::get_total_number_of_states() {
     return SOCKET_STATE_MAX;
 }
 
